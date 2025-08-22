@@ -12,7 +12,7 @@ MAIN_NAME := main
 
 # Busca pelos nomes de arquivos requeridos
 SOURCES := $(wildcard $(SOURCE_DIR)/*.c)
-OBJECTS := $(patsubst $(SOURCE_DIR)/%.o,$(BUILD_DIR)/%.o,$(SOURCES))
+OBJECTS := $(patsubst $(SOURCE_DIR)/%.c,$(BUILD_DIR)/%.o,$(SOURCES))
 
 FFLAGS := $(FFLAGS) -I $(INCLUDES_DIR)
 
@@ -26,7 +26,7 @@ all: $(BUILD_DIR) $(BUILD_DIR)/$(MAIN_NAME)
 
 # Compila tudo e roda
 run: all
-	./$(BUILD_DIR)/$(MAIN_NAME)
+	./$(BUILD_DIR)/$(MAIN_NAME) $(ARGS)
 
 clean:
 	rm -rf $(BUILD_DIR)	

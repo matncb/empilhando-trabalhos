@@ -1,7 +1,18 @@
 #ifndef _FIBONACCI_H
 #define _FIBONACCI_H
 
-unsigned int fibonacci_iterativo(unsigned int n);
-unsigned int fibonacci_recursivo(unsigned int n);
+#define RECURSIVE_REPEATS 100000
+#define ITERATIVE_REPEATS 100000000
+
+unsigned int fibonacci_iterative(unsigned int n);
+
+unsigned int fibonacci_recursive(unsigned int n);
+
+double calculate_recursive_time(unsigned int n);
+
+double calculate_iterative_time(unsigned int n);
+
+double *compair_fibonacci_n(unsigned int n);
+
 
 #endif
