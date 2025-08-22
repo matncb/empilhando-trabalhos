@@ -4,14 +4,17 @@ FFLAGS := -Wall -Wextra
 
 # Configurações de diretórios
 BUILD_DIR := build
-SOURCE_DIR := .
+SOURCE_DIR := src
+INCLUDES_DIR := includes
 
 # Nome do execuável final
 MAIN_NAME := main
 
 # Busca pelos nomes de arquivos requeridos
-SOURCES := $(wildcard $(SOURCE_DIR)/*.c) $(wildcard $(SOURCE_DIR)/*.h)
+SOURCES := $(wildcard $(SOURCE_DIR)/*.c)
 OBJECTS := $(patsubst $(SOURCE_DIR)/%.o,$(BUILD_DIR)/%.o,$(SOURCES))
+
+FFLAGS := $(FFLAGS) -I $(INCLUDES_DIR)
 
 #$(patsubst origem/%, destino/%, lista)
 
@@ -33,7 +36,7 @@ $(BUILD_DIR):
 	mkdir -p $@
 
 # Regra geral para arquivos .o
-$(BUILD_DIR)/%.o: $(SOURCE_DIR)/%.f90
+$(BUILD_DIR)/%.o: $(SOURCE_DIR)/%.c
 	$(FC) $(FFLAGS) -c $< -o $@
 
 # Juntar todos os .o para o main
