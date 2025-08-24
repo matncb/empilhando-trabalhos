@@ -3,6 +3,8 @@
 #include <time.h>
 #include <fibonacci.h>
 
+#include <stdio.h>
+
 
 unsigned int fibonacci_recursive(unsigned int n)
 {
@@ -54,12 +56,17 @@ double calculate_iterative_time(unsigned int n)
     endtime = clock();
     return (double)((int)(endtime - starttime))  / (ITERATIVE_REPEATS * CLOCKS_PER_SEC);
 
-
 }
 
 double *compair_fibonacci_n(unsigned int n)
 {
     double *times = (double*) malloc(sizeof(double)*2);
+
+    if (times == NULL)
+    {
+        printf("Error while allocating memory.");
+        exit(1);
+    }
     
     times[0] = calculate_recursive_time(n);
     times[1] = calculate_iterative_time(n);
