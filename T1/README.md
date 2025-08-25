@@ -20,3 +20,5 @@ Os arquivos `README.md` são:
 
 Para compilação de qualquer dos exercícios, deve-se entrar na pasta do exercício e executar o comando `make`.
 Os arquivos serão compilados nas respetivas pastas `./build` de cada exercício. Cada programa poderá ser executado utilizando `./build/main`.
+
+https://github.com/matncb/empilhando-trabalhos/blob/master/T1/ex2-3_people/REAME.md
