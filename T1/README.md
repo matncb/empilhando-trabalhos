@@ -1,5 +1,7 @@
 ### TRABALHO 1
 
+Este repositório está hospedado no github e pode ser acessado em [Github](https://github.com/matncb/empilhando-trabalhos/tree/master)
+
 ### Organização
 
 O trabalho é organizado em 3 exercícios e 5 diretórios distintos. Para os exercícios 1 e 3, existe apenas uma pasta para cada. Como o exercício 2 pedia diversas variações, fizemos diretórios específicos. Dentro de cada diretório existe um arquivo `README.md`, contendo a ideia geral usada para a elaboração do código-fonte.
