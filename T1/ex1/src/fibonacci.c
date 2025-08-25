@@ -1,17 +1,18 @@
 #include <stdlib.h>
 
-#include <time.h>
+#include <stdio.h>
+#include <time.h> // Usado para calcular o tempo de execução
 #include <fibonacci.h>
 
-#include <stdio.h>
 
-
+// Define a função recursiva
 unsigned int fibonacci_recursive(unsigned int n)
 {
     if (n <= 1) return n;
     return fibonacci_recursive(n-1) + fibonacci_recursive(n-2);
 }
 
+// Define a função iterativa
 unsigned int fibonacci_iterative(unsigned int n)
 {
     if (n <= 1) return n;
@@ -27,6 +28,7 @@ unsigned int fibonacci_iterative(unsigned int n)
     return c;
 }
 
+// Calcula o tempo pela função recursivo
 double calculate_recursive_time(unsigned int n)
 {
     clock_t starttime, endtime;
@@ -42,6 +44,7 @@ double calculate_recursive_time(unsigned int n)
     return (double)((int)(endtime - starttime)) / (RECURSIVE_REPEATS * CLOCKS_PER_SEC);
 }
 
+// Calcula o tempo pela função iterativa
 double calculate_iterative_time(unsigned int n)
 {
     clock_t starttime, endtime;
@@ -58,6 +61,7 @@ double calculate_iterative_time(unsigned int n)
 
 }
 
+// Função que retorna ponteiro com vetor de cada tempo de execução (recursivo e iterativo)
 double *compair_fibonacci_n(unsigned int n)
 {
     double *times = (double*) malloc(sizeof(double)*2);
