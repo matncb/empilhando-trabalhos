@@ -2,17 +2,23 @@
 
 Esta tarefa descreve a implementação de um programa em C responsável por cadastrar as quantidades e valores em estoques de produtos.
 
+---
+
 ## Implementação
 
 ### 1. Estrutura do Código
 
 O programa é modularizado em dois arquivos principais: `main.c` (que contém a lógica principal do programa) e `product.c` (que implementa as funções de manipulação dos produtos e do estoque).
 
+---
+
 ### 2. Estrutura de Dados
 
 A estrutura de dados central do projeto é uma `struct Product`, que representa um único produto no estoque. Para gerenciar uma coleção de produtos de tamanho dinâmico, foi utilizado um **array dinâmico de ponteiros**.
 
  Cada elemento do array `$stock$` é um ponteiro para uma `$struct Product$`, que por sua vez é alocada de forma independente na memória *heap*. Essa estratégia possibilita que tenhamos uma estrutura de dados composta por varios `$struct Product$` que podem ser criados separadamente e ainda removidos da memória quando inutilizados. 
+
+---
 
 ### 3. Análise das Funções
 
