@@ -1,8 +1,7 @@
-# Análise do Programa: Gerenciamento de Estoque de Produtos
+## Análise do Programa: Gerenciamento de Estoque de Produtos
 
 Esta tarefa descreve a implementação de um programa em C responsável por cadastrar as quantidades e valores em estoques de produtos.
 
----
 
 ## Implementação
 
@@ -10,7 +9,6 @@ Esta tarefa descreve a implementação de um programa em C responsável por cada
 
 O programa é modularizado em dois arquivos principais: `main.c` (que contém a lógica principal do programa) e `product.c` (que implementa as funções de manipulação dos produtos e do estoque).
 
----
 
 ### 2. Estrutura de Dados
 
@@ -18,7 +16,6 @@ A estrutura de dados central do projeto é uma `struct Product`, que representa 
 
  Cada elemento do array `$stock$` é um ponteiro para uma `$struct Product$`, que por sua vez é alocada de forma independente na memória *heap*. Essa estratégia possibilita que tenhamos uma estrutura de dados composta por varios `$struct Product$` que podem ser criados separadamente e ainda removidos da memória quando inutilizados. 
 
----
 
 ### 3. Análise das Funções
 
