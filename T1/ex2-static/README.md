@@ -2,7 +2,7 @@
 
 ### Descrição do Projeto
 
-Essa é a versão sem alocação dinâmica de [Gerenciamento de Dados de Pessoas](ex2-dyn/README.md).
+Essa é a versão sem alocação dinâmica de [Gerenciamento de Dados de Pessoas](../ex2-dyn/README.md).
 
 ### Estrutura dos Arquivos
 
