@@ -48,6 +48,35 @@ Levando isso em conta, os valores de variação de tempo ainda são válidos, en
   * Apesar de terem a mesma complexidade assintótica, é provável que a linha da versão **recursiva** seja ligeiramente mais inclinada (ou seja, com tempos maiores). Isso ocorre devido ao *overhead* (custo computacional adicional) da criação de novas chamadas de função e gerenciamento da pilha de recursão, em comparação com um simples incremento em um laço `for`.
   * A versão **iterativa** deve se mostrar consistentemente mais rápida, embora a diferença seja em um fator constante, e não exponencial como no caso de Fibonacci.
 
+
+### **Tempo de Execução: Versão Recursiva**
+
+![Recursive Image](graphics/factorial_recursive_times.png)
+
+* A curva de tempo da versão iterativa se aproxima de uma **reta**, como esperado para $O(n)$ em escala linear
+
+
+---
+
+### **Tempo de Execução: Versão Iterativa**
+
+
+![Iterative Image](graphics/factorial_iterative_times.png)
+
+* A curva de tempo da versão iterativa se aproxima de uma **reta**, como esperado para $O(n)$ em escala linear
+
+---
+
+### **Comparativo em Escala Linear**
+
+![Comparative Image](graphics/factorial_times.png)
+
+* Fica evidente, que, para o problema em questão, a versão iterativa é mais rápida.
+
+---
+
+
+
 ## Conclusão
 
 Os dados e gráficos gerados devem confirmar que ambas as implementações do fatorial possuem uma complexidade de tempo linear, $O(n)$. A análise mostrará que, embora teoricamente equivalentes em termos de complexidade, a abordagem **iterativa é mais eficiente na prática** devido ao menor custo computacional em comparação com as chamadas de função recursivas.
