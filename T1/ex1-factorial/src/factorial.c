@@ -17,7 +17,7 @@ unsigned int factorial_iterative(unsigned int n)
 {
     if (n == 0) return 1;
 
-    unsigned int a = 0;
+    unsigned int a = 1;
     for (unsigned int i = 1; i <= n; i++)
     {
         a*=i;
