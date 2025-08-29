@@ -28,7 +28,7 @@ O código-fonte em C é responsável por:
 
 ### **2. Geração e Visualização de Gráficos (Python)**
 
-O script `graph.py` (não fornecido, mas assumido do projeto anterior) utiliza as seguintes bibliotecas:
+O script `graphic_data.py` utiliza as seguintes bibliotecas:
 
   * **Pandas:** Para ler e manipular os dados do arquivo `data.csv` de forma eficiente.
   * **Matplotlib** e **SciencePlots:** Para criar gráficos de alta qualidade e com estilo científico.
@@ -40,13 +40,13 @@ O script deve gerar gráficos que permitam comparar visualmente o tempo de execu
 Ao contrário do Fibonacci recursivo, cuja complexidade é exponencial $O(2^n)$, o fatorial recursivo tem complexidade linear $O(n)$, assim como sua versão iterativa. Portanto, esperamos resultados diferentes aqui.
 
 Uma informação importante a se considerar é que o `unsigned int` tem capacidade de armazenar apenas 32 bits, o que nos permite calcular até o 12! utilizando o algorítmo.
-Levando isso em conta, os valores de variação de tempo ainda são válidos. Entretanto,  os resultados dos calculos podem (e provavelmente estão) inconssistentes por conta de estouro de memória para fatoriais maiores que 12.
+Porém, os valores de variação de tempo ainda são válidos, mas os resultados dos calculos podem - e provavelmente estão - inconssistentes por conta de estouro de memória para fatoriais maiores que 12.
 
 ### **Tempo de Execução: Ambas as Versões**
 
   * Esperamos que o gráfico de tempo de execução para **ambas** as versões (recursiva e iterativa) se aproxime de uma **linha reta** quando plotado em escala linear. Isso confirma a complexidade $O(n)$ para os dois algoritmos.
   * Apesar de terem a mesma complexidade assintótica, é provável que a linha da versão **recursiva** seja ligeiramente mais inclinada (ou seja, com tempos maiores). Isso ocorre devido ao *overhead* (custo computacional adicional) da criação de novas chamadas de função e gerenciamento da pilha de recursão, em comparação com um simples incremento em um laço `for`.
-  * A versão **iterativa** deve se mostrar consistentemente mais rápida, embora a diferença seja em um fator constante, e não exponencial como no caso de Fibonacci.
+  * A versão **iterativa** deve se mostrar consistentemente mais rápida, embora a diferença seja uma angulação da reta, e não exponencial como no caso de Fibonacci.
 
 
 ### **Tempo de Execução: Versão Recursiva**
@@ -79,7 +79,5 @@ Levando isso em conta, os valores de variação de tempo ainda são válidos. En
 
 ## Conclusão
 
-Os dados e gráficos gerados devem confirmar que ambas as implementações do fatorial possuem uma complexidade de tempo linear, $O(n)$. A análise mostrará que, embora teoricamente equivalentes em termos de complexidade, a abordagem **iterativa é mais eficiente na prática** devido ao menor custo computacional em comparação com as chamadas de função recursivas.
-
-A escolha entre uma e outra em um projeto real pode depender do contexto: a recursiva pode ser considerada mais elegante e próxima da definição matemática, enquanto a iterativa oferece melhor desempenho bruto.
+Os dados e gráficos gerados devem confirmar que ambas as implementações do fatorial possuem uma complexidade de tempo linear, $O(n)$. A análise mostra que, embora teoricamente equivalentes em termos de complexidade, a abordagem **iterativa é mais eficiente na prática** devido ao menor custo computacional em comparação com as chamadas de função recursivas.
 
