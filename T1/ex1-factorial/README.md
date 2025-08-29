@@ -40,7 +40,7 @@ O script deve gerar gráficos que permitam comparar visualmente o tempo de execu
 Ao contrário do Fibonacci recursivo, cuja complexidade é exponencial $O(2^n)$, o fatorial recursivo tem complexidade linear $O(n)$, assim como sua versão iterativa. Portanto, esperamos resultados diferentes aqui.
 
 Uma informação importante a se considerar é que o `unsigned int` tem capacidade de armazenar apenas 32 bits, o que nos permite calcular até o 12! utilizando o algorítmo.
-Levando isso em conta, os valores de variação de tempo ainda são válidos, entretanto,  os resultados dos calculos podem (e provavelmente estão) inconssistentes por conta de estouro de memória para fatoriais maiores que 12.
+Levando isso em conta, os valores de variação de tempo ainda são válidos. Entretanto,  os resultados dos calculos podem (e provavelmente estão) inconssistentes por conta de estouro de memória para fatoriais maiores que 12.
 
 ### **Tempo de Execução: Ambas as Versões**
 
