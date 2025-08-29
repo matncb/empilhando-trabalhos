@@ -13,8 +13,8 @@ O trabalho é organizado em 3 exercícios e 5 diretórios distintos. Para os exe
 Os arquivos `README.md` são:
 
  * [Exercício 1]
-        * [Fibonacci](ex1-fibonacci/README.md)
-        * [Fatorial](ex1-factorial/README.md)
+    * [Fibonacci](ex1-fibonacci/README.md)
+    * [Fatorial](ex1-factorial/README.md)
  * Exercício 2
      * [Exercício 2 - Dinâmico](ex2-dyn/README.md)
      * [Exercício 2 - Estático](ex2-static/README.md)
