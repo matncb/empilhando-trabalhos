@@ -15,7 +15,7 @@ Os arquivos `README.md` são:
  * [Exercício 1]
     * [Fibonacci](ex1-fibonacci/README.md)
     * [Fatorial](ex1-factorial/README.md)
- * Exercício 2
+ * [Exercício 2]
      * [Exercício 2 - Dinâmico](ex2-dyn/README.md)
      * [Exercício 2 - Estático](ex2-static/README.md)
         * [Exercício 2 - Caso específico para 3 Pessoas](ex2-3_people/README.md)
