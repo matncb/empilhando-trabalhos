@@ -19,7 +19,7 @@ Os arquivos `README.md` são:
      * [Exercício 2 - Dinâmico](ex2-dyn/README.md)
      * [Exercício 2 - Estático](ex2-static/README.md)
         * [Exercício 2 - Caso específico para 3 Pessoas](ex2-3_people/README.md)
- * [Exercício]
+ * [Exercício 3]
     * [Exercício 3](ex3/README.md)
 
 **Observação**: Para o exercício 2, recomenda-se ler o caso dinâmico primeiro, já que os outros são explicados com base em modificações nesse projeto. O caso específico foi feito apenas por questão de completude com o enuncidado da questão, mas, em sua essência, difere muito pouco com relação ao caso geral estático.
