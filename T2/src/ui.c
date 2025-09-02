@@ -114,6 +114,8 @@ void ui_run()
                 ui_has_element(setA, x);
                 break;
         }
+        
+        free(cmd);
     }
     
     return ;
