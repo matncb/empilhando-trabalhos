@@ -79,20 +79,41 @@ int *string_split_int(char *string, char *delimiter)
     return numbers;
 }
 
-void ui_get_inpúut()
-{
-    
-}
-
 void ui_run()
 {
     Set *setA = ui_set_init();
     Set *setB = ui_set_init();
     
-    char command[INPT_CMD_MAX_LNGTH];
-    while (true)
+    bool loop = true;
+    char command[INPT_CMD_MAX_LENGTH];
+    while (loop)
     {
-        fgets(command, )
+        fgets(command, INPT_CMD_MAX_LENGTH, stdin);
+        int *cmd = string_split_int(command, " ");
+
+        switch (cmd[0])
+        {
+            case -1:
+                loop = false;
+                break;
+                
+            case 1:
+                ui_union(setA, setB);
+                break;
+
+            case 2:
+                ui_intersect(setA, setB);
+                break;
+
+            case 3:
+                ui_difference(setA, setB);
+                break;
+                
+            case 4:
+                int x = cmd[1];
+                ui_has_element(setA, x);
+                break;
+        }
     }
     
     return ;
