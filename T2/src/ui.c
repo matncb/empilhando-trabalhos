@@ -84,6 +84,7 @@ void ui_run()
     Set *setA = ui_set_init();
     Set *setB = ui_set_init();
     
+    int x;
     bool loop = true;
     char command[INPT_CMD_MAX_LENGTH];
     while (loop)
@@ -110,7 +111,7 @@ void ui_run()
                 break;
                 
             case 4:
-                int x = cmd[1];
+                x = cmd[1];
                 ui_has_element(setA, x);
                 break;
         }
