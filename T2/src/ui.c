@@ -47,13 +47,20 @@ void ui_has_element(Set* set, int x)
     return;
 }
 
+void ui_command_not_exists()
+{
+    printf("Comando não existente\n");
+    return;
+}
+
 Set* ui_set_init()
 {
     char setString[INPT_MAX_LENGTH];
+    int numbers_qnt = 0;
     fgets(setString, INPT_MAX_LENGTH, stdin);
-    int *array = string_split_int(setString, " ");
+    int *array = string_split_int(setString, " ", &numbers_qnt);
 
-    Set *set = set_create(array, 5);
+    Set *set = set_create(array, numbers_qnt);
     if (!set)
     {
         printf("O conjunto não pode ser criado!\n");
@@ -65,7 +72,7 @@ Set* ui_set_init()
 }
 
 
-int *string_split_int(char *string, char *delimiter)
+int *string_split_int(char *string, char *delimiter, int* count)
 {
     int numbers_qnt = 0;
     int *numbers = malloc(sizeof(int)* SET_MAX_LENGTH);
@@ -77,6 +84,7 @@ int *string_split_int(char *string, char *delimiter)
         splited = strtok(NULL, delimiter);
         numbers_qnt++;
     }
+    *count = numbers_qnt;
     return numbers;
 }
 
@@ -91,7 +99,8 @@ void ui_run()
     while (loop)
     {
         fgets(command, INPT_CMD_MAX_LENGTH, stdin);
-        int *cmd = string_split_int(command, " ");
+        int cmd_qnt = 0;
+        int *cmd = string_split_int(command, " ", &cmd_qnt);
 
         switch (cmd[0])
         {
@@ -115,6 +124,10 @@ void ui_run()
                 x = cmd[1];
                 ui_has_element(setA, x);
                 break;
+            default:
+                ui_command_not_exists();
+                break;
+
         }
         
         free(cmd);

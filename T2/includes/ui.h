@@ -10,7 +10,8 @@ void ui_intersect(Set* setA, Set* setB);
 void ui_difference(Set* setA, Set* setB);
 void ui_has_element(Set* set, int x);
 Set* ui_set_init();
-int *string_split_int(char *string, char *delimiter);
+int *string_split_int(char *string, char *delimiter, int* count);
+void ui_command_not_exists();
 void ui_run();
 
 #endif
