@@ -3,7 +3,7 @@
 
 #define INPT_CMD_MAX_LENGTH 20 // QUANTIDADE MAXIMA DE CARACTERES PARA INSERIR NO INPUT
 #define INPT_MAX_LENGTH 100 // QUANTIDADE MAXIMA DE CARACTERES PARA INSERIR NO INPUT
-#define SET_MAX_LENGTH 32*INPT_MAX_LENGTH // 32 bits vezes a quantidade de caracateres
+#define SET_MAX_LENGTH INPT_MAX_LENGTH
 
 void ui_union(Set* setA, Set* setB);
 void ui_intersect(Set* setA, Set* setB);

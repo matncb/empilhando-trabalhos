@@ -105,8 +105,8 @@ Set* set_union(Set* setA, Set* setB)
 
 Set* set_intersect(Set* setA, Set* setB)
 {
-    int total_data_size = setA->length + setB->length;
-
+    int total_data_size = (setA->length < setB->length) ? setA->length : setB->length;
+    
     if (total_data_size == 0)
     {
         return set_create(NULL, 0);
