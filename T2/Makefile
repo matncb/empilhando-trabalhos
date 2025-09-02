@@ -41,5 +41,5 @@ $(BUILD_DIR)/%.o: $(SOURCE_DIR)/%.c
 
 # Juntar todos os .o para o main
 $(BUILD_DIR)/$(MAIN_NAME): $(OBJECTS)
-	$(FC) $(FFLAGS) $(OBJECTS) -o $@
+	$(FC) $(FFLAGS) $(OBJECTS)  -o $@
 
