@@ -86,6 +86,9 @@ int *string_split_int(char *string, char *delimiter, int* count)
     char *splited = strtok(string, delimiter);
 
     while (splited != NULL) {
+        
+        if( numbers_qnt >= SET_MAX_LENGTH ) break;
+
         numbers[numbers_qnt] = atoi(splited);
         splited = strtok(NULL, delimiter);
         numbers_qnt++;
