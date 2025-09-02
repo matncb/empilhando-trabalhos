@@ -54,12 +54,12 @@ Set* ui_set_init()
     int *array = string_split_int(setString, " ");
 
     Set *set = set_create(array, 5);
-
     if (!set)
     {
         printf("O conjunto não pode ser criado!\n");
         exit(1);
     }
+    
     return set;
 }
 
@@ -118,6 +118,9 @@ void ui_run()
         
         free(cmd);
     }
+
+    set_destroy(setA);
+    set_destroy(setB);
     
     return ;
 }
