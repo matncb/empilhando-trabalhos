@@ -60,6 +60,7 @@ Set* ui_set_init()
         exit(1);
     }
     
+    free(array);
     return set;
 }
 
