@@ -8,18 +8,16 @@
 
 int ui_get_top_2(Stack *stack, float *top_item1, float *top_item2)
 {
-    if (stack->top <= 2)
+    if (stack->top <= 1)
     {
         printf("Not enough elements");
-        return 0;
+        return 1;
     }
 
-    stack_top_item(stack, top_item1);
-    stack_pop(stack);
-    stack_top_item(stack, top_item2);
-    stack_pop(stack);
+    *top_item1 = stack_pop(stack);
+    *top_item2 = stack_pop(stack);
 
-    return 1;
+    return 0;
 }
 
 void ui_push_number(Stack *stack, float number)
@@ -30,89 +28,129 @@ void ui_push_number(Stack *stack, float number)
 
 void ui_sum_numbers(Stack *stack)
 {
-    float *top_item1, *top_item2;
-    if (!(ui_get_top_2(stack, top_item1, top_item2)))
+    float top_item1, top_item2;
+    if (ui_get_top_2(stack, &top_item1, &top_item2))
     {
         return;
     }
 
-    float sum = *top_item1 + *top_item2;
+    float sum = top_item1 + top_item2;
     stack_push(stack, sum);
 
-    printf("%f", sum);
+    printf("%.2f\n", sum);
 }
 
 void ui_subtract_numbers(Stack *stack)
 {
-    float *top_item1, *top_item2;
-    if (!(ui_get_top_2(stack, top_item1, top_item2)))
+    float top_item1, top_item2;
+    if (ui_get_top_2(stack, &top_item1, &top_item2))
     {
         return;
     }
 
-    float diff = *top_item1 - *top_item2;
+    float diff = top_item1 - top_item2;
     stack_push(stack, diff);
 
-    printf("%f", diff);
+    printf("%.2f\n", diff);
 }
 
 void ui_multiply_numbers(Stack *stack)
 {
-    float *top_item1, *top_item2;
-    if (!(ui_get_top_2(stack, top_item1, top_item2)))
+    float top_item1, top_item2;
+    if (ui_get_top_2(stack, &top_item1, &top_item2))
     {
         return;
     }
 
-    float mul = (*top_item1) * (*top_item2);
+    float mul = (top_item1 * top_item2);
     stack_push(stack, mul);
 
-    printf("%f", mul);
+    printf("%.2f\n", mul);
 }
 
 void ui_divide_numbers(Stack *stack)
 {
-    float *top_item1, *top_item2;
-    if (!(ui_get_top_2(stack, top_item1, top_item2)))
+    float top_item1, top_item2;
+    if (ui_get_top_2(stack, &top_item1, &top_item2))
     {
         return;
     }
 
-    float div = *top_item2 / *top_item1;
+    float div = top_item2 / top_item1;
     stack_push(stack, div);
 
-    printf("%f", div);
+    printf("%.2f\n", div);
 }
 
 void ui_exp_numbers(Stack *stack)
 {
-    float *top_item1, *top_item2;
-    if (!(ui_get_top_2(stack, top_item1, top_item2)))
+    float top_item1, top_item2;
+    if (ui_get_top_2(stack, &top_item1, &top_item2))
     {
         return;
     }
 
-    float exp = pow(*top_item2, *top_item1);
+    float exp = pow(top_item2, top_item1);
     stack_push(stack, exp);
 
-    printf("%f", exp);
+    printf("%.2f\n", exp);
 }
-    
-void ui_run()   
+
+void ui_list(Stack *stack)
+{
+    while (!stack_is_empty(stack))
+    {
+        printf("%.2f ", stack_pop(stack));
+    }
+}
+
+void ui_run()
 {
     bool loop = true;
     char command[INPT_CMD_MAX_LENGTH];
 
+    Stack *stack = stack_create_empty();
+
     while (loop)
     {
         scanf("%s", command);
-        
+        if (strcmp(command, "+") == 0)
+        {
+            ui_sum_numbers(stack);
+        }
+        else if (strcmp(command, "-") == 0)
+        {
+            ui_subtract_numbers(stack);
+        }
+        else if (strcmp(command, "-") == 0)
+        {
+            ui_subtract_numbers(stack);
+        }
+        else if (strcmp(command, "*") == 0)
+        {
+            ui_subtract_numbers(stack);
+        }
+        else if (strcmp(command, "^") == 0)
+        {
+            ui_exp_numbers(stack);
+        }
+        else if (strcmp(command, "/") == 0)
+        {
+            ui_divide_numbers(stack);
+        }
+        else
+        {
+            ui_push_number(stack, atof(command));
+        }
+
         if (strcmp(command, "off") == 0)
         {
             loop = false;
-            break;
+            printf("Pilha: ");
+            ui_list(stack);
+            printf("\n");
         }
     }
 
-    return ;
+    return;
 }
