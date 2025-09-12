@@ -21,7 +21,7 @@ Stack *stack_empty(Stack *stack)
 
 bool stack_is_full(Stack *stack)
 {
-    if (stack->top = LENGTH) return true;
+    if (stack->top == LENGTH) return true;
     return false;
 }
 
@@ -54,7 +54,14 @@ void stack_pop(Stack *stack)
     stack->top--;
 }
 
-float stack_top_item(Stack *stack)
+int stack_top_item(Stack *stack, float* top_item)
 {
-    return stack->items[stack->top];    
+    if (stack_is_empty(stack))
+    {
+        printf("Stack is empty");
+        return 0;
+    }
+    
+    *top_item =  stack->items[stack->top -1];  
+    return 1;  
 }

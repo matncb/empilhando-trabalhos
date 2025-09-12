@@ -14,7 +14,7 @@ Stack *stack_create_empty();
 Stack *stack_empty(Stack *stack);
 bool stack_is_full(Stack *stack);
 void stack_push(Stack *stack, float item);
-float stack_top_item(Stack *stack);
+int stack_top_item(Stack *stack, float* top_item);
 void stack_pop(Stack *stack);
 bool stack_is_empty(Stack *stack);
 
