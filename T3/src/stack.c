@@ -14,59 +14,52 @@ Stack *stack_create_empty()
     return stack;
 }
 
-Stack *stack_empty(Stack *stack)
-{
-    free(stack);
-    return stack_create_empty();
-}
-
 bool stack_is_full(Stack *stack)
 {
-    if (stack->top == STACK_SIZE)
-        return true;
-    return false;
+    return stack->top == STACK_SIZE;
 }
 
 bool stack_is_empty(Stack *stack)
 {
-    if (!stack->top)
-        return true;
-    return false;
+    return !stack->top;
 }
 
-void stack_push(Stack *stack, float item)
+int stack_push(Stack *stack, float item)
 {
     if (stack_is_full(stack))
     {
-        printf("Stack is full");
-        return;
+        printf("Stack is full \n");
+        return 1;
     }
 
     stack->items[stack->top] = item;
     stack->top++;
-    return;
+    return 0;
 }
 
-float stack_pop(Stack *stack)
+int stack_pop(Stack *stack, float *item)
 {
     if (stack_is_empty(stack))
     {
-        printf("Stack is empty");
-        return STACK_IS_EMPTY;
+        printf("Stack is empty \n");
+        return 1;
     }
     stack->top--;
-    return stack->items[stack->top];
+
+    *item = stack->items[stack->top];
+    return 0;
 }
 
-float stack_peek(Stack *stack)
+int stack_peek(Stack *stack, float *item)
 {
     if (stack_is_empty(stack))
     {
-        printf("Stack is empty");
-        return STACK_IS_EMPTY;
+        printf("Stack is empty \n");
+        return 1;
     }
 
-    return stack->items[stack->top - 1];
+    *item = stack->items[stack->top - 1];
+    return 0;
 }
 
 int stack_size(Stack *stack)

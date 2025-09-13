@@ -10,12 +10,12 @@ int ui_get_top_2(Stack *stack, float *top_item1, float *top_item2)
 {
     if (stack->top <= 1)
     {
-        printf("Not enough elements");
+        printf("Not enough elements \n");
         return 1;
     }
 
-    *top_item1 = stack_pop(stack);
-    *top_item2 = stack_pop(stack);
+    stack_pop(stack, top_item1);
+    stack_pop(stack, top_item2);
 
     return 0;
 }
@@ -48,7 +48,7 @@ void ui_subtract_numbers(Stack *stack)
         return;
     }
 
-    float diff = top_item1 - top_item2;
+    float diff = top_item2 - top_item1;
     stack_push(stack, diff);
 
     printf("%.2f\n", diff);
@@ -98,10 +98,14 @@ void ui_exp_numbers(Stack *stack)
 
 void ui_list(Stack *stack)
 {
-    while (!stack_is_empty(stack))
+    float item;
+
+    while ((!stack_is_empty(stack)))
     {
-        printf("%.2f ", stack_pop(stack));
+        stack_pop(stack, &item);
+        printf("%.2f ", item);
     }
+
 }
 
 void ui_run()
@@ -110,6 +114,7 @@ void ui_run()
     char command[INPT_CMD_MAX_LENGTH];
 
     Stack *stack = stack_create_empty();
+    if (!stack) exit(1);
 
     while (loop)
     {
@@ -122,13 +127,9 @@ void ui_run()
         {
             ui_subtract_numbers(stack);
         }
-        else if (strcmp(command, "-") == 0)
-        {
-            ui_subtract_numbers(stack);
-        }
         else if (strcmp(command, "*") == 0)
         {
-            ui_subtract_numbers(stack);
+            ui_multiply_numbers(stack);
         }
         else if (strcmp(command, "^") == 0)
         {
@@ -137,20 +138,20 @@ void ui_run()
         else if (strcmp(command, "/") == 0)
         {
             ui_divide_numbers(stack);
-        }
-        else
-        {
-            ui_push_number(stack, atof(command));
-        }
-
-        if (strcmp(command, "off") == 0)
+        } else if (strcmp(command, "off") == 0)
         {
             loop = false;
             printf("Pilha: ");
             ui_list(stack);
             printf("\n");
         }
+        else 
+        {
+            ui_push_number(stack, atof(command));
+        }
     }
+
+    free(stack);
 
     return;
 }
