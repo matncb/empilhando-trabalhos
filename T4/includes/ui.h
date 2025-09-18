@@ -19,4 +19,6 @@ void ui_print_document(Document document);
 
 void free_split_strings(char **strings, int count);
 
+int ui_list_off(Queue *queue);
+
 #endif

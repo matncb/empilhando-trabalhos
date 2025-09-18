@@ -71,6 +71,32 @@ int ui_list(Queue *queue)
     return 0;
 }
 
+int ui_list_off(Queue *queue)
+{
+    Document *documents = queue_get_documents(queue);
+    if (!documents)
+    {
+        printf("Sem memória para impressão\n");
+        return 1;
+    }
+
+    int elements = queue_get_elements(queue);
+
+    printf("Fila final: [");
+    for (int i = 0; i < elements; i++)
+    {
+        ui_print_document(documents[i]);
+
+        if (i != elements - 1)
+            printf(", ");
+    }
+    printf("]\n");
+
+    free(documents);
+
+    return 0;
+}
+
 void free_split_strings(char **strings, int count)
 {
     for (int i = 0; i < count; i++)
@@ -110,7 +136,7 @@ void ui_run()
                 ui_list(queue);
             }
             else if(strcmp(command, "off\n") == 0){
-                ui_list(queue);
+                ui_list_off(queue);
                 free_split_strings(strings, command_qnt);
                 break;
             }    
