@@ -37,8 +37,10 @@ int ui_print(Queue *queue)
 
 void ui_print_document(Document document)
 {
-    printf("%s (%d paginas, %s, %s)", document.name, 
-        document.pages, 
+    printf("%s (%d %s, %s, %s)", 
+        document.name, 
+        document.pages,
+        document.pages > 1 ? "paginas" : "pagina",
         document.color, 
         document.format);
 
