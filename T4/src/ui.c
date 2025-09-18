@@ -144,7 +144,7 @@ void ui_run()
             }    
         }
         else if(command_qnt == 5){
-            strings[4][strlen(strings[4])-1] = '\0';
+            strings[4][strlen(strings[4])-2] = '\0';
             if(strstr(strings[0], "add")){
                 Document document;
                 strcpy(document.name, strings[1]); // name
