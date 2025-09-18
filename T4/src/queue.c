@@ -18,14 +18,7 @@ Queue *queue_create()
 
 int queue_add(Queue *queue, Document document)
 {
-    /*
-    if (!queue_is_full()) {
-        queue->documents[queue->top] = document;
-        queue->top = (queue->top+1) % QUEUE_SIZE;
-    } else {
-        return 1 
-    }
-    */
+ 
     if (queue_is_full(queue))
     {
         return 1;
@@ -57,6 +50,32 @@ int queue_remove(Queue *queue, Document *document)
 
 }
 
+Document *queue_get_documents(Queue *queue)
+{
+    Queue *new_queue = (Queue*) malloc(sizeof(Queue));
+
+    if (!new_queue) return NULL;
+    *new_queue = *queue;
+
+    Document *documents = (Document*) malloc(sizeof(Document)*queue->elements);
+    if (!documents) return NULL;
+
+    for (int i = 0; i<queue->elements; i++)
+    {
+        queue_remove(new_queue, &documents[i]);
+    }
+
+    free(new_queue);
+
+    return documents;
+
+}
+
+int queue_get_elements(Queue *queue)
+{
+    return queue->elements;
+}
+
 bool queue_is_empty(Queue *queue)
 {
     return (queue->elements == 0);
@@ -64,6 +83,5 @@ bool queue_is_empty(Queue *queue)
 
 bool queue_is_full(Queue *queue)
 {
-    //return (queue->top+1) % QUEUE_SIZE == queue->bottom;
     return (queue->elements == QUEUE_SIZE);
 }

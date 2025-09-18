@@ -13,14 +13,25 @@ int ui_add_document(Queue *queue, Document document)
     return queue_add(queue, document);
 }
 
-
 int ui_print(Queue *queue)
 {
     int res;
     Document document;
     
     res = queue_remove(queue, &document);
-    if (!res) ui_print_document(document);
+    
+    if (!res)
+    {
+        printf("Imprimindo: ");
+        ui_print_document(document);
+        printf("\n");
+    }
+    else
+    {
+        printf("Fila de impressao vazia.\n");
+    }
+
+     
     return res;
 }
 
@@ -34,27 +45,40 @@ void ui_print_document(Document document)
     return;
 }
 
-void ui_list_off(Queue *queue)
-{
-    while (!ui_print(queue)){
-        if (!queue_is_empty(queue)) printf(", ");
-    }
-}
 
 int ui_list(Queue *queue)
 {
-    Queue *new_queue = (Queue *) malloc(sizeof(Queue));
-    if (!new_queue) return 1;
+    Document *documents = queue_get_documents(queue);
+    if (!documents) {
+        printf("Sem memória para impressão\n");
+        return 1;
+    }
 
-    *new_queue = *queue;
+    int elements = queue_get_elements(queue);
+
     printf("Fila: [");
-    ui_list_off(new_queue);
+    for (int i=0; i < elements; i++)
+    {
+        ui_print_document(documents[i]);
+
+        if(i != elements-1) printf(", ");
+    
+    }
     printf("]\n");
 
-    free(new_queue);
+    free(documents);
+
     return 0;
 }
 
+void free_split_strings(char **strings, int count)
+{
+    for (int i = 0; i < count; i++)
+    {
+        free(strings[i]);
+    }
+    free(strings);
+}
 
 void ui_run()
 {
@@ -71,40 +95,41 @@ void ui_run()
         fgets(command, FULL_CMD_LENGTH, stdin);
 
         char**strings = string_split(command, " ", &command_qnt);
+        if(!strings) {
+            printf("Sem memória disponível\n");
+            return;
+        }
 
         if(command_qnt == 1){
-            if(strcmp(command, "print\n") == 0){
-                if(queue_is_empty(queue)){
-                    printf("Fila de impressao vazia.\n");
-                }else{
-                    printf("Imprimindo: ");
-                    ui_print(queue);
-                    printf("\n");
-                }
-            }else if(strcmp(command, "list\n") == 0){
+            if(strcmp(command, "print\n") == 0)
+            {
+                ui_print(queue);
+            }
+            else if(strcmp(command, "list\n") == 0)
+            {
                 ui_list(queue);
-            }else if(strcmp(command, "off\n") == 0){
-                printf("Fila final: [");
-                ui_list_off(queue);
-                printf("]\n");
+            }
+            else if(strcmp(command, "off\n") == 0){
+                ui_list(queue);
+                free_split_strings(strings, command_qnt);
                 break;
             }    
-        }else if(command_qnt == 5){
+        }
+        else if(command_qnt == 5){
             strings[4][strlen(strings[4])-1] = '\0';
             if(strcmp(strings[0], "add") == 0){
-                Document document = {
-                    strings[1], // name
-                    atoi(strings[2]), // pages
-                    strings[3], //color
-                    strings[4] // format
-                };
+                Document document;
+                strcpy(document.name, strings[1]); // name
+                document.pages = atoi(strings[2]); // pages
+                strcpy(document.color, strings[3]); // color
+                strcpy(document.format, strings[4]); // format
+                
                 queue_add(queue, document);
             }
         }
-        
-        
+            
+        free_split_strings(strings, command_qnt); 
     }
-
     free(queue);
 
 }
@@ -113,6 +138,7 @@ char **string_split(char *string, char *delimiter, int* count)
 {
     int cmd_qnt = 0;
     char **strings = malloc(sizeof(char*)* MAX_CMD);
+    if(!strings) return NULL;
 
     char *splited = strtok(string, delimiter);
 

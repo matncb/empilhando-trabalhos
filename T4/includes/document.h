@@ -1,17 +1,16 @@
 #ifndef _DOCUMENT_H
 #define _DOCUMENT_H
 
-#define QUEUE_SIZE 100
 #define NAME_LENGTH 100
 #define COLOR_LENGTH 100
 #define FORMAT_LENGTH 100
 
 typedef struct
 {
-    char *name;
+    char name[NAME_LENGTH];
     int pages;
-    char *color;
-    char *format;
+    char color[COLOR_LENGTH];
+    char format[FORMAT_LENGTH];
     
 } Document;
 
