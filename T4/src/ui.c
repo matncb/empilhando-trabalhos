@@ -154,6 +154,8 @@ void ui_run()
                 
                 queue_add(queue, document);
             }
+        }else{
+            printf("Comando não existente\n");
         }
             
         free_split_strings(strings, command_qnt); 
