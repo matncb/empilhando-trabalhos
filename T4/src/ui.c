@@ -75,6 +75,11 @@ int ui_list(Queue *queue)
 
 int ui_list_off(Queue *queue)
 {
+
+    // a função queue_get_documents retorna uma cópia dos documentos de queue 
+    // sem de fato alterar o próprio queue, visto que 
+    // só temos o método de remove para receber os elementos da fila
+    
     Document *documents = queue_get_documents(queue);
     if (!documents)
     {
@@ -129,6 +134,9 @@ void ui_run()
         }
 
         if(command_qnt == 1){
+
+            // utilizamos substring ao inves de strcmp() 
+            // pois havia uma diferença entre linux e windows usando \r\n e apenas o \n
             if(strstr(command, "print"))
             {
                 ui_print(queue);
@@ -138,15 +146,25 @@ void ui_run()
                 ui_list(queue);
             }
             else if(strstr(command, "off")){
-                ui_list_off(queue);
+                ui_list_off(queue); // Formatação de saída diferente
                 free_split_strings(strings, command_qnt);
                 break;
             }    
         }
         else if(command_qnt == 5){
+
+            // a string tem um \r e um \n, 
+            // como eu preciso remover o carriage return e o new line
+            // adicionei o char nulo substituindo o \r, assim já removo os dois caracteres indesejados
             strings[4][strlen(strings[4])-2] = '\0';
+
+
             if(strstr(strings[0], "add")){
                 Document document;
+
+                // fizemos uma cópia dos ponteiros de string, 
+                // pois ao longo do fluxo de impressão de documento pode ocorrer liberação de memória
+                // e apagar as strings dos documentos de forma indevida
                 strcpy(document.name, strings[1]); // name
                 document.pages = atoi(strings[2]); // pages
                 strcpy(document.color, strings[3]); // color
