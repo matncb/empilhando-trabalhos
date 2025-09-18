@@ -5,6 +5,14 @@
 #define MAX_CMD 5
 #define FULL_CMD_LENGTH MAX_CMD_LENGTH*MAX_CMD+MAX_CMD
 
+#ifdef WIN32
+#define END_LINE "\r\n"
+#endif
+
+#ifdef __linux__
+#define END_LINE "\n"
+#endif
+
 void ui_run();
 
 char **string_split(char *string, char *delimiter, int* count);

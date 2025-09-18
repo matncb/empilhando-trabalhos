@@ -132,20 +132,19 @@ void ui_run()
             printf("Sem memória disponível\n");
             return;
         }
+        strings[0][strcspn(strings[0], END_LINE)] = '\0';
 
         if(command_qnt == 1){
 
-            // utilizamos substring ao inves de strcmp() 
-            // pois havia uma diferença entre linux e windows usando \r\n e apenas o \n
-            if(strstr(command, "print"))
+            if(!strcmp(strings[0], "print"))
             {
                 ui_print(queue);
             }
-            else if(strstr(command, "list"))
+            else if(!strcmp(strings[0], "list"))
             {
                 ui_list(queue);
             }
-            else if(strstr(command, "off")){
+            else if(!strcmp(strings[0], "off")){
                 ui_list_off(queue); // Formatação de saída diferente
                 free_split_strings(strings, command_qnt);
                 break;
@@ -156,10 +155,10 @@ void ui_run()
             // a string tem um \r e um \n, 
             // como eu preciso remover o carriage return e o new line
             // adicionei o char nulo substituindo o \r, assim já removo os dois caracteres indesejados
-            strings[4][strlen(strings[4])-2] = '\0';
+            strings[4][strcspn(strings[4], END_LINE)] = '\0';
 
 
-            if(strstr(strings[0], "add")){
+            if(!strcmp(strings[0], "add")){
                 Document document;
 
                 // fizemos uma cópia dos ponteiros de string, 
