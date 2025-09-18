@@ -129,15 +129,15 @@ void ui_run()
         }
 
         if(command_qnt == 1){
-            if(strcmp(command, "print\n") == 0)
+            if(strcmp(command, "print\r\n") == 0)
             {
                 ui_print(queue);
             }
-            else if(strcmp(command, "list\n") == 0)
+            else if(strcmp(command, "list\r\n") == 0)
             {
                 ui_list(queue);
             }
-            else if(strcmp(command, "off\n") == 0){
+            else if(strcmp(command, "off\r\n") == 0){
                 ui_list_off(queue);
                 free_split_strings(strings, command_qnt);
                 break;
