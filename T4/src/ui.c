@@ -129,15 +129,15 @@ void ui_run()
         }
 
         if(command_qnt == 1){
-            if(strcmp(command, "print\r\n") == 0)
+            if(strstr(command, "print"))
             {
                 ui_print(queue);
             }
-            else if(strcmp(command, "list\r\n") == 0)
+            else if(strstr(command, "list"))
             {
                 ui_list(queue);
             }
-            else if(strcmp(command, "off\r\n") == 0){
+            else if(strstr(command, "off")){
                 ui_list_off(queue);
                 free_split_strings(strings, command_qnt);
                 break;
@@ -145,7 +145,7 @@ void ui_run()
         }
         else if(command_qnt == 5){
             strings[4][strlen(strings[4])-1] = '\0';
-            if(strcmp(strings[0], "add") == 0){
+            if(strstr(strings[0], "add")){
                 Document document;
                 strcpy(document.name, strings[1]); // name
                 document.pages = atoi(strings[2]); // pages
@@ -175,6 +175,9 @@ char **string_split(char *string, char *delimiter, int* count)
         if( cmd_qnt >= MAX_CMD ) break;
 
         strings[cmd_qnt] = malloc(sizeof(char)*MAX_CMD_LENGTH);
+
+        if (!strings[cmd_qnt]) return NULL;
+
         strcpy(strings[cmd_qnt], splited);
         splited = strtok(NULL, delimiter);
         cmd_qnt++;
