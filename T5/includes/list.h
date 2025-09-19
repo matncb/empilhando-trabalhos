@@ -5,18 +5,14 @@
 
 typedef struct List
 {
-    struct List *start;
-    struct List *end;
-
+    struct Element *start;
     int elements;
 
 }List;
 
 typedef struct Element
 {
-    struct List *next;
-    struct List *prev;
-
+    struct Element *next;
     Data *data;
 
 }Element;

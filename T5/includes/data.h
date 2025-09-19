@@ -6,6 +6,4 @@ typedef struct Data
     
 }Data;
 
-
-
 #endif
