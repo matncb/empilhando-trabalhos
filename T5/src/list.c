@@ -165,6 +165,7 @@ int list_remove_by_name(List *list, char *name)
             list->elements--;
             return 0;
         }
+        aux = aux->next;
     }
 
        

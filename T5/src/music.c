@@ -3,7 +3,12 @@
 #include <string.h>
 #include <stdlib.h>
 
-// funções de set
+typedef struct Music
+{
+    char *name;
+    char *artist;
+    int duration;
+} Music;
 
 Music *music_create(char *name, char *artist, int duration)
 {
@@ -29,6 +34,8 @@ void music_free(Music *music)
 
     return;
 }
+
+// funções de set
 
 void music_set_name(Music *music, char *name)
 {

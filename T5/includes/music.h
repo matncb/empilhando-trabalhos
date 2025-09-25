@@ -1,13 +1,8 @@
 #ifndef _MUSIC_H
 #define _MUSIC_H
 
-// Tipo para ser exportado
-typedef struct Music
-{
-    char *name;
-    char *artist;
-    int duration;
-} Music;
+struct Music;
+typedef struct Music Music;
 
 char *music_get_name(Music *music);
 Music *music_create(char *name, char *artist, int duration);
