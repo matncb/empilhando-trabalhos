@@ -31,7 +31,7 @@ void ui_play(List *list)
 {
     if (list_get_elements(list) == 0)
     {
-        printf("Nao ha musicas na playlist.\n");
+        printf("Playlist vazia.\n");
         return;
     }
     
