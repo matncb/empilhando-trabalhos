@@ -5,7 +5,7 @@
 #define MAX_CMD 5
 #define FULL_CMD_LENGTH MAX_CMD_LENGTH*MAX_CMD+MAX_CMD
 
-#define FORCE_RUN_CODES // Input/Saída completamente louca do run codes
+//#define FORCE_RUN_CODES // Input/Saída completamente louca do run codes
 
 #ifndef FORCE_RUN_CODES
 
@@ -21,6 +21,11 @@
 #define END_LINE "\r\n"
 #endif
 
-
+void ui_run();
+char **string_split(char *string, char *delimiter, int *count);
+void ui_list(List *list);
+void ui_play(List *list);
+void ui_remove(List *list, char *name);
+void free_split_strings(char **strings, int count);
 
 #endif
