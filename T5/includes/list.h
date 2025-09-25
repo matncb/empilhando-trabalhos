@@ -3,12 +3,8 @@
 
 #include <music.h>
 
-struct List;
 typedef struct List List;
-
-struct Element;
 typedef struct Element Element;
-
 
 List *list_create();
 int list_append(List *list, Music *music);

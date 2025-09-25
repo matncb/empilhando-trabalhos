@@ -49,11 +49,15 @@ void ui_play(List *list)
 void ui_list(List *list)
 {
     Music **musics = list_songs(list);
+
     
     int elements = list_get_elements(list);
     if (elements == 0) 
     {
         printf("Playlist: []\n"); 
+        if(musics){
+            free(musics);
+        }
         return;
     }
     
@@ -182,7 +186,14 @@ char **string_split(char *string, char *delimiter, int *count)
         strings[cmd_qnt] = malloc(sizeof(char) * MAX_CMD_LENGTH);
 
         if (!strings[cmd_qnt])
+        {
+            // implementação feita para remover vazamento de memoria
+            for (int i = 0; i < cmd_qnt; i++) {
+                free(strings[i]);
+            }
+            free(strings);
             return NULL;
+        }    
 
         strcpy(strings[cmd_qnt], splited);
         splited = strtok(NULL, delimiter);

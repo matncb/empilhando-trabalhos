@@ -1,7 +1,6 @@
 #ifndef _MUSIC_H
 #define _MUSIC_H
 
-struct Music;
 typedef struct Music Music;
 
 char *music_get_name(Music *music);
