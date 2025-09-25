@@ -53,7 +53,7 @@ void ui_list(List *list)
     int elements = list_get_elements(list);
     if (elements == 0) 
     {
-        printf("Playlist: []\n");
+        printf("Playlist: []\n"); 
         return;
     }
     
@@ -68,6 +68,7 @@ void ui_list(List *list)
         if(i != elements-1) printf(" -> ");
     }
     printf("\n");
+    free(musics);
     
     return;
 }
@@ -104,10 +105,6 @@ void ui_run()
             else if (!strcmp(strings[0], "list"))
             {
                 ui_list(list);
-            }
-            else if (!strcmp(strings[0], "remove"))
-            {
-                ui_remove(list, strings[1]);
             }
             else if (!strcmp(strings[0], "off"))
             {
@@ -159,6 +156,7 @@ void ui_run()
         else
         {
             printf("Comando não existente\n");
+            free_split_strings(strings, command_qnt);
         }
 
         free_split_strings(strings, command_qnt);

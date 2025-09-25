@@ -106,6 +106,14 @@ Music **list_songs(List *list)
 
 void list_free(List *list)
 {
+    if (!list) return;
+
+    if (list->elements == 0)
+    {
+        free(list);
+        return;
+    }
+    
     Element *aux = list->start;
     Element *aux_free;
     while (aux->next)

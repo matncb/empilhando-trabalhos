@@ -10,6 +10,9 @@ Music *music_create(char *name, char *artist, int duration)
     Music *music = malloc(sizeof(Music));
     if (!music) return NULL;
 
+    music->name = NULL;
+    music->artist = NULL;
+
     music_set_name(music, name);
     music_set_artist(music, artist);
     music_set_duration(music, duration);    
@@ -19,9 +22,12 @@ Music *music_create(char *name, char *artist, int duration)
 
 void music_free(Music *music)
 {
+    if (!music) return;
     free(music->name);
     free(music->artist);
     free(music);
+
+    return;
 }
 
 void music_set_name(Music *music, char *name)
