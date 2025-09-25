@@ -4,7 +4,6 @@
 #include <music.h>
 
 typedef struct List List;
-typedef struct Element Element;
 
 List *list_create();
 int list_append(List *list, Music *music);

@@ -6,13 +6,6 @@
 #include <list.h>
 #include <music.h>
 
-typedef struct List
-{
-    struct Element *start;
-    int elements;
-
-}List;
-
 typedef struct Element
 {
     struct Element *next;
@@ -20,6 +13,13 @@ typedef struct Element
     Music *music;
 
 }Element;
+
+typedef struct List
+{
+    struct Element *start;
+    int elements;
+
+}List;
 
 List *list_create()
 {

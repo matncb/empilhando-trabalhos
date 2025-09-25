@@ -156,11 +156,14 @@ void ui_run()
 
                 list_append(list, music);
             }
+            else
+            {
+                printf("Comando inexistente\n");
+            }
         }
         else
         {
-            printf("Comando não existente\n");
-            free_split_strings(strings, command_qnt);
+            printf("Quantidade incorreta de argumentos\n");
         }
 
         free_split_strings(strings, command_qnt);
