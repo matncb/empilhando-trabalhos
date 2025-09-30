@@ -116,6 +116,7 @@ void ui_run()
         if (!strings)
         {
             printf("Sem memória disponível\n");
+            list_free(list);
             return;
         }
         
@@ -173,12 +174,14 @@ void ui_run()
                     atoi(strings[3]) //  duration
                 );
 
-                if(!task) {
-                    printf("Sem memória disponível\n");
-                    return;
+                if(!task)
+                {
+                    printf("Sem memória disponível\n");  
                 }
-
-                list_add_end(list, task);
+                else
+                {
+                    list_add_end(list, task);
+                }
             }
             else
             if (!strcmp(strings[0], "adicionar_prioritario"))
@@ -189,12 +192,14 @@ void ui_run()
                     atoi(strings[3]) //  duration
                 );
 
-                if(!task) {
+                if(!task) 
+                {
                     printf("Sem memória disponível\n");
-                    return;
                 }
-
-                list_add_start(list, task);
+                else
+                {
+                    list_add_start(list, task);
+                }       
             }
             else
             {

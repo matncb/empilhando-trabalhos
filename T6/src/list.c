@@ -87,7 +87,15 @@ int list_remove_end(List *list)
     if(list->elements == 0) return 1;
 
     Element *aux = list->end;
-    if ((list->end)->prev) ((list->end)->prev)->next = NULL;
+    if ((list->end)->prev)
+    {
+        ((list->end)->prev)->next = NULL;
+    }
+    else
+    {
+        list->start = (list->end)->next;
+    }
+
     list->end = (list->end)->prev;
     element_free(aux);
 
@@ -101,7 +109,14 @@ int list_remove_start(List *list)
     if (list->elements == 0) return 1;
 
     Element *aux = list->start;
-    if ((list->start)->next) ((list->start)->next)->prev = NULL;
+    if ((list->start)->next)
+    {
+        ((list->start)->next)->prev = NULL;
+    }
+    else
+    {
+        list->end = (list->start)->prev;
+    }
     list->start = (list->start)->next;
     element_free(aux);
 

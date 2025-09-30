@@ -18,6 +18,5 @@ Task *list_end_element(List *list);
 int list_remove_by_name(List *list, char *name);
 void list_free(List *list);
 int list_get_elements(List *list);
-Task *list_start_element(List *list);
 
 #endif
