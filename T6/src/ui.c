@@ -31,7 +31,7 @@ void ui_execute_next(List *list)
 {
     if (list_get_elements(list) == 0)
     {
-        printf("Gerenciador vazio.\n");
+        printf("A lista de tarefas esta vazia.\n");
         return;
     }
     
