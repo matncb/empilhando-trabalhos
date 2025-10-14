@@ -20,79 +20,58 @@ void ui_remove(List *list, char *name)
 {
     if (list_remove_by_name(list, name))
     {
-        printf("Tarefa %s nao encontrada.\n", name);
+        printf("Contato %s nao encontrado.\n", name);
         return;
     }
 
-    printf("Tarefa %s removida.\n", name);
+    printf("Contato %s removido.\n", name);
 }
 
-void ui_execute_next(List *list)
+void ui_search(List *list, char *name)
 {
-    if (list_get_elements(list) == 0)
+    Data *data = list_search_by_name(list, name);
+    if (!data)
     {
-        printf("A lista de tarefas esta vazia.\n");
+        printf("Contato %s nao encontrado.\n", name);
         return;
     }
-    
-    Task *task = list_start_element(list);
-    printf("Tarefa Concluida: %s, %s, %imin\n",
-        task_get_name(task), 
-        task_get_description(task), 
-        task_get_duration(task)
-    );
 
-    list_remove_start(list);
-    return;
+    printf("Contato Encontrado: [%s, %s, %s]", 
+            data_get_name(data), 
+            data_get_tel(data), 
+            data_get_email(data)
+        );
 }
 
-void ui_execute_last(List *list)
-{
-    if (list_get_elements(list) == 0)
-    {
-        printf("A lista de tarefas esta vazia.\n");
-        return;
-    }
-    
-    Task *task = list_end_element(list);
-    printf("Tarefa Concluida: %s, %s, %imin\n",
-        task_get_name(task), 
-        task_get_description(task), 
-        task_get_duration(task)
-    );
-
-    list_remove_end(list);
-    return;
-}
 
 
 void ui_list(List *list)
 {
-    Task **tasks = list_tasks(list);
+    Data **datas = list_datas(list);
 
     
     int elements = list_get_elements(list);
     if (elements == 0) 
     {
-        printf("Lista de Tarefas: \n"); 
-        if(tasks){
-            free(tasks);
+        printf("Contatos: \n"); 
+        if(datas){
+            free(datas);
         }
         return;
     }
     
-    printf("Lista de Tarefas: ");
+    printf("Contatos:\n");
     for (int i = 0; i < elements; i++)
     {
-        printf("[%s, %s, %imin]", 
-            task_get_name(tasks[i]), 
-            task_get_description(tasks[i]), 
-            task_get_duration(tasks[i])
+        printf("-[%s, %s, %s]", 
+            data_get_name(datas[i]), 
+            data_get_tel(datas[i]), 
+            data_get_email(datas[i])
         );
         if(i != elements-1) printf(" -> ");
     }
     printf("\n");
-    free(tasks);
+    free(datas);
     
     return;
 }
@@ -123,15 +102,8 @@ void ui_run()
         if (command_qnt == 1)
         {
             strings[0][strcspn(strings[0], END_LINE)] = '\0';
-            if (!strcmp(strings[0], "executar_proxima"))
-            {
-                ui_execute_next(list);
-            }
-            else if (!strcmp(strings[0], "executar_ultima"))
-            {
-                ui_execute_last(list);
-            }
-            else if (!strcmp(strings[0], "listar"))
+    
+            if (!strcmp(strings[0], "listar"))
             {
                 ui_list(list);
             }
@@ -153,6 +125,10 @@ void ui_run()
             {
                 ui_remove(list, strings[1]); // name
             }
+            if (!strcmp(strings[0], "buscar"))
+            {
+                ui_remove(list, strings[1]); // name
+            }
             else
             {
                 printf("Comando não existente\n");
@@ -166,40 +142,22 @@ void ui_run()
             // adicionei o char nulo substituindo o \r, assim já removo os dois caracteres indesejados
             strings[3][strcspn(strings[3], END_LINE)] = '\0';
 
-            if (!strcmp(strings[0], "adicionar"))
+            if (!strcmp(strings[0], "inserir"))
             {
-                Task *task = task_create(
+                Data *data = data_create(
                     strings[1], // name
-                    strings[2],  // description
-                    atoi(strings[3]) //  duration
+                    strings[2],  // tel
+                    strings[3] //  email
                 );
 
-                if(!task)
+                if(!data)
                 {
                     printf("Sem memória disponível\n");  
                 }
                 else
                 {
-                    list_add_end(list, task);
+                    list_add(list, data);
                 }
-            }
-            else
-            if (!strcmp(strings[0], "adicionar_prioritario"))
-            {
-                Task *task = task_create(
-                    strings[1], // name
-                    strings[2],  // description
-                    atoi(strings[3]) //  duration
-                );
-
-                if(!task) 
-                {
-                    printf("Sem memória disponível\n");
-                }
-                else
-                {
-                    list_add_start(list, task);
-                }       
             }
             else
             {
