@@ -19,16 +19,12 @@ Data *data_create(char *name, char *tel, char *email)
     data->tel = NULL;
     data->email = NULL;
 
-    data_set_name(data, name);
-    data_set_tel(data, tel);
-    data_set_email(data, email); 
-    
-    if ((!data->name) || (!data->tel) || (!data->tel))
+    if (data_set_name(data, name) || data_set_tel(data, tel) || data_set_email(data, email))
     {
         free(data);
         return NULL;
     }
-    
+
     return data;
 }
 
@@ -45,34 +41,43 @@ void data_free(Data *data)
 }
 
 // funções de set
-void data_set_name(Data *data, char *name)
+int data_set_name(Data *data, char *name)
 {
-    if(data == NULL) return;
+    if(data == NULL) return 1;
     
     if (data->name != NULL) {
         free(data->name);
     }
     data->name = strdup(name); 
+    if(!data->name) return 1;
+
+    return 0;
 }
 
-void data_set_tel(Data *data, char *tel)
+int data_set_tel(Data *data, char *tel)
 {
-    if(data == NULL) return;
+    if(data == NULL) return 1;
 
     if (data->tel != NULL) {
         free(data->tel);
     }
     data->tel = strdup(tel);
+    if(!data->tel) return 1;
+    
+    return 0;
 }
 
-void data_set_email(Data *data, char *email)
+int data_set_email(Data *data, char *email)
 {
-    if(data == NULL) return;
+    if(data == NULL) return 1;
 
     if (data->email != NULL) {
         free(data->email);
     }
     data->email = strdup(email);
+    if(!data->email) return 1;
+    
+    return 0;
 }
 
 // funções de get
