@@ -36,14 +36,12 @@ void ui_search(List *list, char *name)
         return;
     }
 
-    printf("Contato Encontrado: [%s, %s, %s]", 
+    printf("Contato Encontrado: [%s, %s, %s]\n", 
             data_get_name(data), 
             data_get_tel(data), 
             data_get_email(data)
         );
 }
-
-
 
 void ui_list(List *list)
 {
@@ -63,14 +61,12 @@ void ui_list(List *list)
     printf("Contatos:\n");
     for (int i = 0; i < elements; i++)
     {
-        printf("-[%s, %s, %s]", 
+        printf("- [%s, %s, %s]\n", 
             data_get_name(datas[i]), 
             data_get_tel(datas[i]), 
             data_get_email(datas[i])
         );
-        if(i != elements-1) printf(" -> ");
     }
-    printf("\n");
     free(datas);
     
     return;
@@ -125,9 +121,9 @@ void ui_run()
             {
                 ui_remove(list, strings[1]); // name
             }
-            if (!strcmp(strings[0], "buscar"))
+            else if (!strcmp(strings[0], "buscar"))
             {
-                ui_remove(list, strings[1]); // name
+                ui_search(list, strings[1]); // name
             }
             else
             {

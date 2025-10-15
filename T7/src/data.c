@@ -4,14 +4,8 @@
 #include <stdlib.h>
 
 
-enum NameCompairissonReturn {
-    INCORRECT_PARAMS_ERROR = 2,
-    NULL_NAMES_ERROR = 3,
-    DATA1_BEFORE = -1,
-    DATA2_BEFORE = 1
-};
 
-typedef strucct data
+typedef struct data
 {
     char *name;
     char *tel;
@@ -104,37 +98,37 @@ char *data_get_email(Data *data)
 int data_compare_order(Data *data1, Data *data2)
 {
     // Código de erro para argumentos incorretos 
-    if ((data1 == NULL) || (data2 == NULL)) return 2;
+    if ((data1 == NULL) || (data2 == NULL)) return INCORRECT_PARAMS_ERROR;
 
-    if ((data1->name == NULL) || (data2->name ==NULL)) return 3;
+    if ((data1->name == NULL) || (data2->name ==NULL)) return NULL_NAMES_ERROR;
     
     if (strcmp(data1->name, data2->name) < 0)
     {
-        return -1; // data1 vem antes
+        return DATA1_BEFORE; // data1 vem antes
     }
     else if (strcmp(data1->name, data2->name) > 0)
     {
-        return 1; // data1 vem depois
+        return DATA2_BEFORE; // data1 vem depois
     }
-    
-    return 0; // data1 é igual
+
+    return DATA_EQUAL; // data1 é igual
 }
 
 int data_compare_order_by_name(Data *data1, char *name)
 {
     // Código de erro para argumentos incorretos
-    if (data1 == NULL) return 2;
+    if (data1 == NULL) return INCORRECT_PARAMS_ERROR ;
 
-    if ((data1->name == NULL) || name == NULL)  return 3;
+    if ((data1->name == NULL) || name == NULL)  return NULL_NAMES_ERROR;
 
     if (strcmp(data1->name, name) < 0)
     {
-        return -1; // data1 vem antes
+        return DATA1_BEFORE; // data1 vem antes
     }
     else if (strcmp(data1->name, name) > 0)
     {
-        return 1; // data1 vem depois
+        return DATA2_BEFORE; // data1 vem depois
     }
 
-    return 0; // data1 é igual
+    return DATA_EQUAL; // data1 é igual
 }
