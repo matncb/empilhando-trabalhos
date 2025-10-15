@@ -21,7 +21,7 @@ Data *data_create(char *name, char *tel, char *email)
 
     if (data_set_name(data, name) || data_set_tel(data, tel) || data_set_email(data, email))
     {
-        free(data);
+        data_free(data);
         return NULL;
     }
 
