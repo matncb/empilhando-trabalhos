@@ -51,7 +51,7 @@ void ui_list(List *list)
     int elements = list_get_elements(list);
     if (elements == 0) 
     {
-        printf("Contatos: \n"); 
+        printf("A agenda de contatos esta vazia.\n"); 
         if(datas){
             free(datas);
         }
@@ -152,7 +152,10 @@ void ui_run()
                 }
                 else
                 {
-                    list_add(list, data);
+                    if(list_add(list, data) == 2){
+                        printf("Contato %s ja existe.\n", data_get_name(data));
+                        data_free(data);
+                    }
                 }
             }
             else

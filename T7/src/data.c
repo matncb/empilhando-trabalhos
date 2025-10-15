@@ -3,8 +3,6 @@
 #include <string.h>
 #include <stdlib.h>
 
-
-
 typedef struct data
 {
     char *name;
@@ -23,7 +21,13 @@ Data *data_create(char *name, char *tel, char *email)
 
     data_set_name(data, name);
     data_set_tel(data, tel);
-    data_set_email(data, email);    
+    data_set_email(data, email); 
+    
+    if ((!data->name) || (!data->tel) || (!data->tel))
+    {
+        free(data);
+        return NULL;
+    }
     
     return data;
 }
@@ -41,7 +45,6 @@ void data_free(Data *data)
 }
 
 // funções de set
-
 void data_set_name(Data *data, char *name)
 {
     if(data == NULL) return;

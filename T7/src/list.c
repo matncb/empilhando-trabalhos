@@ -231,7 +231,7 @@ int list_add(List *list, Data *data)
         if (compare == DATA_EQUAL)
         {
             // já existe um contato com esse nome
-            return 1;
+            return 2;
         }
         else if (compare == DATA2_BEFORE)
         {
