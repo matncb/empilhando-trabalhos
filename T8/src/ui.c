@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <string.h>
-#include <list.h>
+#include <tree.h>
 #include <ui.h>
 
 void free_split_strings(char **strings, int count)
@@ -16,55 +16,52 @@ void free_split_strings(char **strings, int count)
     return;
 }
 
-void ui_remove(List *list, char *name)
+void ui_remove(Tree *tree, int code)
 {
-    if (list_remove_by_name(list, name))
+    if (tree_remove(tree, code))
     {
-        printf("Contato %s nao encontrado.\n", name);
+        printf("Produto %d nao encontrado.\n", code);
         return;
     }
 
-    printf("Contato %s removido.\n", name);
+    printf("Produto %d removido.\n", code);
 }
 
-void ui_search(List *list, char *name)
+void ui_search(Tree *tree, int code)
 {
-    Data *data = list_search_by_name(list, name);
+    Data *data = tree_search_by_code_pure(tree, code);
     if (!data)
     {
-        printf("Contato %s nao encontrado.\n", name);
+        printf("Produto %d nao encontrado.\n", code);
         return;
     }
 
-    printf("Contato Encontrado: [%s, %s, %s]\n", 
+    printf("Produto Encontrado: [%d, %s, %.2f]\n", 
+            data_get_code(data), 
             data_get_name(data), 
-            data_get_tel(data), 
-            data_get_email(data)
+            data_get_price(data)
         );
 }
 
-void ui_list(List *list)
+void ui_tree(Tree *tree, PathType path)
 {
-    Data **datas = list_datas(list);
+    int elements = tree_get_elements(tree);
 
-    
-    int elements = list_get_elements(list);
     if (elements == 0) 
     {
-        printf("A agenda de contatos esta vazia.\n"); 
-        if(datas){
-            free(datas);
-        }
+        printf("A lista de Produtos esta vazia.\n"); 
         return;
     }
-    
-    printf("Contatos:\n");
+
+    Data **datas = tree_list(tree, path);
+    printf("Produtos ");
+
     for (int i = 0; i < elements; i++)
     {
-        printf("- [%s, %s, %s]\n", 
+        printf("- [%d, %s, %.2f]\n", 
+            data_get_code(datas[i]), 
             data_get_name(datas[i]), 
-            data_get_tel(datas[i]), 
-            data_get_email(datas[i])
+            data_get_price(datas[i])
         );
     }
     free(datas);
@@ -76,9 +73,9 @@ void ui_run()
 {
     char command[FULL_CMD_LENGTH];
 
-    List *list = list_create();
+    Tree *tree = tree_create();
 
-    if (list == NULL)
+    if (tree == NULL)
         exit(1);
 
     while (true)
@@ -91,7 +88,7 @@ void ui_run()
         if (!strings)
         {
             printf("Sem memória disponível\n");
-            list_free(list);
+            tree_free(tree);
             return;
         }
         
@@ -99,14 +96,22 @@ void ui_run()
         {
             strings[0][strcspn(strings[0], END_LINE)] = '\0';
     
-            if (!strcmp(strings[0], "listar"))
+            if (!strcmp(strings[0], "preordem"))
             {
-                ui_list(list);
+                ui_tree(tree, PATH_PREORDER);
+            }
+            else if (!strcmp(strings[0], "inordem"))
+            {
+                ui_tree(tree, PATH_INORDER);
+            }
+            else if (!strcmp(strings[0], "posordem"))
+            {
+                ui_tree(tree, PATH_POSORDER);
             }
             else if (!strcmp(strings[0], "sair"))
             {
                 free_split_strings(strings, command_qnt);
-                list_free(list);
+                tree_free(tree);
                 return ;
             }
             else
@@ -119,11 +124,11 @@ void ui_run()
             strings[1][strcspn(strings[1], END_LINE)] = '\0';
             if (!strcmp(strings[0], "remover"))
             {
-                ui_remove(list, strings[1]); // name
+                ui_remove(tree, atoi(strings[1])); // code
             }
             else if (!strcmp(strings[0], "buscar"))
             {
-                ui_search(list, strings[1]); // name
+                ui_search(tree, atoi(strings[1])); // code
             }
             else
             {
@@ -141,9 +146,9 @@ void ui_run()
             if (!strcmp(strings[0], "inserir"))
             {
                 Data *data = data_create(
-                    strings[1], // name
-                    strings[2],  // tel
-                    strings[3] //  email
+                    atoi(strings[1]), // code
+                    strings[2],  // name
+                    atof(strings[3]) //  price
                 );
 
                 if(!data)
@@ -152,8 +157,8 @@ void ui_run()
                 }
                 else
                 {
-                    if(list_add(list, data) == 2){
-                        printf("Contato %s ja existe.\n", data_get_name(data));
+                    if(tree_add(tree, data) == 1){
+                        printf("Produto %s ja existe.\n", data_get_name(data));
                         data_free(data);
                     }
                 }
@@ -170,7 +175,7 @@ void ui_run()
 
         free_split_strings(strings, command_qnt);
     }
-    list_free(list);
+    tree_free(tree);
 }
 
 char **string_split(char *string, char *delimiter, int *count)

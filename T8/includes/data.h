@@ -3,22 +3,23 @@
 
 typedef struct data Data;
 
-enum NameCompairissonReturn {
+enum CodeCompairissonReturn {
     DATA1_BEFORE = -1,
     DATA_EQUAL = 0,
     DATA2_BEFORE = 1,
     INCORRECT_PARAMS_ERROR = 2,
     NULL_NAMES_ERROR = 3
 };
-char *data_get_name(Data *data);
-Data *data_create(char *name, char *tel, char *email);
+
+Data *data_create(int code, char *name, float price);
 void data_free(Data *data);
+int data_set_code(Data *data, int code);
 int data_set_name(Data *data, char *name);
-int data_set_tel(Data *data, char *tel);
-int data_set_email(Data *data, char *email);
-char *data_get_tel(Data *data);
-char *data_get_email(Data *data);
+int data_set_price(Data *data, float price);
+int data_get_code(Data *data);
+char *data_get_name(Data *data);
+float data_get_price(Data *data);
 int data_compare_order(Data *data1, Data *data2);
-int data_compare_order_by_name(Data *data1, char *name);
+int data_compare_order_by_code(Data *data1, int code);
 
 #endif 

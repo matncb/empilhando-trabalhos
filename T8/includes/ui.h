@@ -21,14 +21,11 @@
 #define END_LINE "\r\n"
 #endif
 
+void free_split_strings(char **strings, int count);
+void ui_remove(Tree *tree, int code);
+void ui_search(Tree *tree, int code);
+void ui_tree(Tree *tree, PathType path);
 void ui_run();
 char **string_split(char *string, char *delimiter, int *count);
-void ui_list(List *list);
-
-void ui_execute_next(List *list);
-void ui_execute_last(List *list);
-
-void ui_remove(List *list, char *name);
-void free_split_strings(char **strings, int count);
 
 #endif

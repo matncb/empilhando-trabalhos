@@ -3,16 +3,31 @@
 
 #include <data.h>
 
-typedef struct List List;
+typedef struct Tree Tree;
 typedef struct Element Element;
 
-List *list_create();
+typedef enum PathType
+{
+    PATH_INORDER,
+    PATH_PREORDER,
+    PATH_POSORDER
+} PathType;
+
 void element_free(Element *aux);
-Data **list_datas(List *list);
-int list_remove_by_name(List *list, char *name);
-Data *list_search_by_name(List *list, char *name);
-void list_free(List *list);
-int list_get_elements(List *list);
-int list_add(List *list, Data *data);
+Element *element_create(Data *data);
+Tree *tree_create();
+void tree_free_recursive(Element *elem);
+void tree_free(Tree *tree);
+int tree_get_elements(Tree *tree);
+void tree_preorder_recursive(Element *elem, Data **list, int *pos);
+void tree_inorder_recursive(Element *elem, Data **list, int *pos);
+void tree_posorder_recursive(Element *elem, Data **list, int *pos);
+Data **tree_list(Tree *tree, PathType path);
+void tree_node_search_by_code_recursive(Element *node, int code, Element **out_element, bool *found, Element **parent);
+Element *tree_search_by_code(Tree *tree, int code, bool *found, Element **parent);
+int tree_add(Tree *tree, Data *data);
+void tree_node_search_max_recursive(Element *node, Element **out_element, Element **parent);
+int tree_remove(Tree *tree, int code);
+Data *tree_search_by_code_pure(Tree *tree, int code);
 
 #endif
