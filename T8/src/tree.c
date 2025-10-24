@@ -42,7 +42,7 @@ Element *element_create(Data *data)
 
 Tree *tree_create()
 {
-    Tree *tree = (Tree *)malloc(sizeof(tree));
+    Tree *tree = (Tree *)malloc(sizeof(Tree));
     if (tree == NULL) return NULL;
 
     tree->root = NULL;
@@ -173,7 +173,7 @@ Element *tree_search_by_code(Tree *tree, int code, bool *found, Element **parent
 Data *tree_search_by_code_pure(Tree *tree, int code) 
 {
     if (tree == NULL || tree -> root == NULL) return NULL;
-    bool found;
+    bool found = false;
     Element *out_element = NULL;
     Element *parent = NULL;
     tree_node_search_by_code_recursive(tree->root, code, &out_element, &found, &parent);
@@ -187,7 +187,7 @@ int tree_add(Tree *tree, Data *data)
 {
     if (tree == NULL) return 2;
 
-    bool found;
+    bool found = false;
     Element *parent = NULL;
 
     Element *search = tree_search_by_code(tree, data_get_code(data), &found, &parent);
@@ -227,49 +227,94 @@ void tree_node_search_max_recursive(Element *node, Element **out_element,  Eleme
     tree_node_search_max_recursive(node->right, out_element, parent);
 }
 
+int tree_remove_node(Tree *tree, Element *search, Element *parent)
+{
+    if ((!search->left) && (!search->right))
+    {
+        if (!parent)
+        {
+            tree->root = NULL;
+        }
+        else if (parent->right == search)
+        {
+            parent->right = NULL;
+        }
+        else
+        {
+            parent->left = NULL;
+        }
+
+        element_free(search);
+        tree->elements--;
+        return 0;
+    }
+
+    if ((!search->left) && (search->right))
+    {
+        if (!parent)
+        {
+            tree->root = search->right;
+        }
+        else if (parent->right == search)
+        {
+            parent->right = search->right;
+        }
+        else
+        {
+            parent->left = search->right;
+        }
+
+        element_free(search);
+        tree->elements--;
+        return 0;
+    }
+
+    if ((search->left) && (!search->right))
+    {
+        if (!parent)
+        {
+            tree->root = search->left;
+        }
+        else if (parent->right == search)
+        {
+            parent->right = search->left;
+        }
+        else
+        {
+            parent->left = search->left;
+        }
+
+        element_free(search);
+        tree->elements--;
+        return 0;
+    }
+
+    return 1;
+}
+
 int tree_remove(Tree *tree, int code)
 {
     if (tree == NULL) return 2;
 
-    bool found;
+    bool found = false;
     Element *parent = NULL;
 
     Element *search = tree_search_by_code(tree, code, &found, &parent);
     if (!found) return 1;
 
+    if (!tree_remove_node(tree,search, parent)) return 0;
+    
     Element *new_root_parent = search;
     Element *new_root = NULL;
 
-    if (search->left)
-    {
-        tree_node_search_max_recursive(search->left, &new_root, &new_root_parent);
-    }
-    else
-    {
-        new_root = search->right;
-        new_root_parent = search;
-    }
-    
-    if (parent->left == search)
-    {
-        parent->left = new_root;
-    }
-    else
-    {
-        parent->right = new_root;
-    }
-    
-    if (new_root_parent->left == new_root)
-    {
-        new_root_parent->left = NULL;
-    }
-    else
-    {
-        new_root_parent->right = NULL;
-    }
+    tree_node_search_max_recursive(search->left, &new_root, &new_root_parent);
 
-    element_free(search);
-    tree->elements--;
-    return 0;
-}
+    Data *aux = search->data;
+    search->data = new_root->data;
+    new_root->data = aux;
+
+    if (!tree_remove_node(tree, new_root, new_root_parent)) return 0;
+
+    return 1;
  
+}

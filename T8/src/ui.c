@@ -54,8 +54,22 @@ void ui_tree(Tree *tree, PathType path)
     }
 
     Data **datas = tree_list(tree, path);
-    printf("Produtos ");
 
+    switch (path)
+    {
+    case PATH_INORDER:
+        printf("Produtos em ordem:\n");
+        break;
+
+    case PATH_PREORDER:
+        printf("Produtos em pre-ordem:\n");
+        break;
+
+    case PATH_POSORDER:
+        printf("Produtos em pos-ordem:\n");
+        break;
+    }
+    
     for (int i = 0; i < elements; i++)
     {
         printf("- [%d, %s, %.2f]\n", 
@@ -88,8 +102,7 @@ void ui_run()
         if (!strings)
         {
             printf("Sem memória disponível\n");
-            tree_free(tree);
-            return;
+            break;
         }
         
         if (command_qnt == 1)
@@ -111,8 +124,7 @@ void ui_run()
             else if (!strcmp(strings[0], "sair"))
             {
                 free_split_strings(strings, command_qnt);
-                tree_free(tree);
-                return ;
+                break;
             }
             else
             {
@@ -157,8 +169,15 @@ void ui_run()
                 }
                 else
                 {
-                    if(tree_add(tree, data) == 1){
+                    int res = tree_add(tree, data);
+                    if (res == 1)
+                    {
                         printf("Produto %s ja existe.\n", data_get_name(data));
+                        data_free(data);
+                    }
+                    if (res == 2)
+                    {
+                        printf("Sem memória disponível\n");
                         data_free(data);
                     }
                 }

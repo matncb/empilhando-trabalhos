@@ -63,10 +63,7 @@ int data_set_name(Data *data, char *name)
 int data_set_price(Data *data, float price)
 {
     if(data == NULL) return 1;
-
     data->price = price;
-    if(!data->price) return 1;
-    
     return 0;
 }
 
