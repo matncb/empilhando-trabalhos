@@ -1,0 +1,201 @@
+#include <stdio.h>
+#include <stdbool.h>
+#include <stdlib.h>
+#include <string.h>
+
+#include <playlist.h>
+#include <music.h>
+
+typedef struct Element
+{
+    struct Element *next;
+    struct Element *prev;
+
+    Music *music;
+
+} Element;
+
+typedef struct PlayList
+{
+    struct Element *start;
+    struct Element *end;
+    int elements;
+
+} PlayList;
+
+void element_free(Element *aux)
+{
+    if (aux == NULL)
+        return;
+    music_free(aux->music);
+    free(aux);
+    return;
+}
+
+PlayList *playlist_create()
+{
+    PlayList *playlist = (PlayList *)malloc(sizeof(PlayList));
+    if (playlist == NULL)
+        return NULL;
+
+    playlist->elements = 0;
+    playlist->start = NULL;
+    playlist->end = NULL;
+
+    return playlist;
+}
+
+void playlist_free(PlayList *playlist)
+{
+    if (!playlist)
+        return;
+
+    if (playlist->elements == 0)
+    {
+        free(playlist);
+        return;
+    }
+
+    Element *aux = playlist->start;
+    Element *aux_free;
+    while (aux->next)
+    {
+        aux_free = aux;
+        aux = aux->next;
+
+        element_free(aux_free);
+    }
+
+    element_free(aux);
+    free(playlist);
+}
+
+int playlist_get_elements(PlayList *playlist)
+{
+    if (!playlist)
+        return -1;
+    return playlist->elements;
+}
+
+Music **playlist_songs(PlayList *playlist)
+{
+    if (!playlist)
+        return NULL;
+    if (playlist->elements == 0)
+        return NULL;
+
+    Music **array = (Music **)malloc(sizeof(Music *) * playlist->elements);
+    if (!array)
+        return NULL;
+
+    Element *aux = playlist->start;
+    int i = 0;
+
+    do
+    {
+        array[i] = aux->music;
+        aux = aux->next;
+        i++;
+
+    } while (aux);
+
+    return array;
+}
+
+int playlist_remove_by_name(PlayList *playlist, char *name)
+{
+    if (playlist == NULL || name == NULL)
+        return 1;
+    if (playlist->elements == 0)
+        return 1;
+
+    Element *aux = playlist->start;
+
+    int compare = MUSIC1_BEFORE;
+
+    while ((compare == MUSIC1_BEFORE) && (aux != NULL))
+    {
+        compare = music_compare_order_by_name(aux->music, name);
+
+        if (compare == MUSIC_EQUAL)
+        {
+            if (aux->prev)
+            {
+                (aux->prev)->next = aux->next;
+            }
+            else
+            {
+                playlist->start = aux->next;
+            }
+
+            if (aux->next)
+            {
+                (aux->next)->prev = aux->prev;
+            }
+            else
+            {
+                playlist->end = aux->prev;
+            }
+
+            element_free(aux);
+            playlist->elements--;
+            return 0;
+        }
+        aux = aux->next;
+    }
+    return 1;
+}
+
+Music *playlist_search_by_name(PlayList *playlist, char *name)
+{
+    if (playlist == NULL || name == NULL)
+        return NULL;
+    
+    if (playlist->elements == 0)
+        return NULL;
+
+    Element *aux = playlist->start;
+    int compare = MUSIC1_BEFORE;
+
+    while ((compare == MUSIC1_BEFORE) && (aux != NULL))
+    {
+        compare = music_compare_order_by_name(aux->music, name);
+
+        if (compare == MUSIC_EQUAL)
+        {
+            return aux->music;
+        }
+        aux = aux->next;
+    }
+
+    return NULL;
+}
+
+int playlist_add(PlayList *playlist, Music *music)
+{
+    if (playlist == NULL) return 1;
+
+    Element *aux = playlist->start;
+    int compare = MUSIC1_BEFORE;
+
+    while ((compare == MUSIC1_BEFORE) && aux != NULL)
+    {
+        compare = music_compare_order(aux->music, music);
+
+        if (compare == MUSIC_EQUAL)
+        {
+            // já existe uma música com esse nome
+            return 2;
+        }
+        else if (compare == MUSIC2_BEFORE)
+        {
+            break;
+        }
+
+        aux = aux->next;
+    }
+
+    if (aux == NULL) return playlist_add_end(playlist,music);
+
+    return playlist_add_before(playlist,aux,music);
+}
