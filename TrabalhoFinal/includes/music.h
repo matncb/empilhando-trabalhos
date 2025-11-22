@@ -3,12 +3,12 @@
 
 typedef struct music Music;
 
-enum NameCompairissonReturn {
+enum MusicComparisonReturn {
     MUSIC1_BEFORE = -1,
     MUSIC_EQUAL = 0,
     MUSIC2_BEFORE = 1,
-    INCORRECT_PARAMS_ERROR = 2,
-    NULL_NAMES_ERROR = 3
+    MUSIC_INCORRECT_PARAMS_ERROR = 2,
+    MUSIC_NULL_NAMES_ERROR = 3
 };
 char *music_get_name(Music *music);
 Music *music_create(char *name, char *artist, char *comment);

@@ -94,9 +94,9 @@ int person_set_email(Person *person, char *email)
     return 0;
 }
 
-int person_set_playlist(Person *person, PlayList *playlist)
+int person_set_playlist(Person *person, void *playlist)
 {
-    if(!playlist)
+    if(!person || !playlist)
         return 1;
 
     person->playlist = playlist;
@@ -125,8 +125,10 @@ char *person_get_email(Person *person)
     return person->email;
 }
 
-PlayList *person_get_playlist(Person *person)
+void *person_get_playlist(Person *person)
 {
+    if (person == NULL)
+        return NULL;
     return person->playlist;
 }
 

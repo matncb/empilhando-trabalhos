@@ -20,6 +20,8 @@ int person_set_tel(Person *person, char *tel);
 int person_set_email(Person *person, char *email);
 char *person_get_tel(Person *person);
 char *person_get_email(Person *person);
+int person_set_playlist(Person *person, void *playlist);
+void *person_get_playlist(Person *person);
 int person_compare_order(Person *person1, Person *person2);
 int person_compare_order_by_name(Person *person1, char *name);
 

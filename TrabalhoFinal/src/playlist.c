@@ -23,7 +23,7 @@ typedef struct PlayList
 
 } PlayList;
 
-void element_free(Element *aux)
+static void playlist_element_free(Element *aux)
 {
     if (aux == NULL)
         return;
@@ -63,10 +63,10 @@ void playlist_free(PlayList *playlist)
         aux_free = aux;
         aux = aux->next;
 
-        element_free(aux_free);
+        playlist_element_free(aux_free);
     }
 
-    element_free(aux);
+    playlist_element_free(aux);
     free(playlist);
 }
 
@@ -137,7 +137,7 @@ int playlist_remove_by_name(PlayList *playlist, char *name)
                 playlist->end = aux->prev;
             }
 
-            element_free(aux);
+            playlist_element_free(aux);
             playlist->elements--;
             return 0;
         }
@@ -198,4 +198,56 @@ int playlist_add(PlayList *playlist, Music *music)
     if (aux == NULL) return playlist_add_end(playlist,music);
 
     return playlist_add_before(playlist,aux,music);
+}
+
+int playlist_add_end(PlayList *playlist, Music *music)
+{
+    if (!playlist)
+        return 1;
+
+    Element *new_element = (Element *)malloc(sizeof(Element));
+    if (new_element == NULL)
+        return 1;
+
+    new_element->music = music;
+    new_element->prev = playlist->end;
+    new_element->next = NULL;
+
+    if (playlist->end)
+        (playlist->end)->next = new_element;
+    if (!new_element->prev)
+        playlist->start = new_element;
+
+    playlist->end = new_element;
+    playlist->elements++;
+
+    return 0;
+}
+
+int playlist_add_before(PlayList *playlist, Element *element, Music *music)
+{
+    if (!element)
+        return 1;
+    Element *new_element = (Element *)malloc(sizeof(Element));
+    if (new_element == NULL)
+        return 1;
+
+    new_element->music = music;
+    new_element->prev = element->prev;
+    new_element->next = element;
+
+    if (element->prev)
+    {
+        element->prev->next = new_element;
+    }
+    else
+    {
+        playlist->start = new_element;
+    }
+
+    element->prev = new_element;
+
+    playlist->elements++;
+
+    return 0;
 }

@@ -7,8 +7,7 @@ typedef struct PopList PopList;
 typedef struct Element Element;
 
 PopList *poplist_create();
-void element_free(Element *aux);
-Person **poplist_songs(PopList *poplist);
+Person **poplist_people(PopList *poplist);
 int poplist_remove_by_name(PopList *poplist, char *name);
 Person *poplist_search_by_name(PopList *poplist, char *name);
 void poplist_free(PopList *poplist);

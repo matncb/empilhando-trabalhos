@@ -23,7 +23,7 @@ typedef struct PopList
 
 } PopList;
 
-void element_free(Element *aux)
+static void poplist_element_free(Element *aux)
 {
     if (aux == NULL)
         return;
@@ -63,10 +63,10 @@ void poplist_free(PopList *poplist)
         aux_free = aux;
         aux = aux->next;
 
-        element_free(aux_free);
+        poplist_element_free(aux_free);
     }
 
-    element_free(aux);
+    poplist_element_free(aux);
     free(poplist);
 }
 
@@ -137,7 +137,7 @@ int poplist_remove_by_name(PopList *poplist, char *name)
                 poplist->end = aux->prev;
             }
 
-            element_free(aux);
+            poplist_element_free(aux);
             poplist->elements--;
             return 0;
         }

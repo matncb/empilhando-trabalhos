@@ -106,37 +106,37 @@ char *music_get_comment(Music *music)
 int music_compare_order(Music *music1, Music *music2)
 {
     // Código de erro para argumentos incorretos 
-    if ((music1 == NULL) || (music2 == NULL)) return INCORRECT_PARAMS_ERROR;
+    if ((music1 == NULL) || (music2 == NULL)) return MUSIC_INCORRECT_PARAMS_ERROR;
 
-    if ((music1->name == NULL) || (music2->name ==NULL)) return NULL_NAMES_ERROR;
+    if ((music1->name == NULL) || (music2->name ==NULL)) return MUSIC_NULL_NAMES_ERROR;
     
     if (strcmp(music1->name, music2->name) < 0)
     {
-        return DATA1_BEFORE; // music1 vem antes
+        return MUSIC1_BEFORE; // music1 vem antes
     }
     else if (strcmp(music1->name, music2->name) > 0)
     {
-        return DATA2_BEFORE; // music1 vem depois
+        return MUSIC2_BEFORE; // music1 vem depois
     }
 
-    return DATA_EQUAL; // music1 é igual
+    return MUSIC_EQUAL; // music1 é igual
 }
 
 int music_compare_order_by_name(Music *music1, char *name)
 {
     // Código de erro para argumentos incorretos
-    if (music1 == NULL) return INCORRECT_PARAMS_ERROR ;
+    if (music1 == NULL) return MUSIC_INCORRECT_PARAMS_ERROR ;
 
-    if ((music1->name == NULL) || name == NULL)  return NULL_NAMES_ERROR;
+    if ((music1->name == NULL) || name == NULL)  return MUSIC_NULL_NAMES_ERROR;
 
     if (strcmp(music1->name, name) < 0)
     {
-        return DATA1_BEFORE; // music1 vem antes
+        return MUSIC1_BEFORE; // music1 vem antes
     }
     else if (strcmp(music1->name, name) > 0)
     {
-        return DATA2_BEFORE; // music1 vem depois
+        return MUSIC2_BEFORE; // music1 vem depois
     }
 
-    return DATA_EQUAL; // music1 é igual
+    return MUSIC_EQUAL; // music1 é igual
 }
