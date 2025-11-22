@@ -303,7 +303,8 @@ O balanceamento funciona da seguinte forma:
 - Atualizada dinamicamente quando playlists são modificadas
 - Fornece visualização ordenada diferente da PopList
 
-**Observação importante**: Apesar de ser levemente diferente do que é feito no resto das aplicações, para um sistema integrado completo, é muito útil poder ordenar os resultados por tamanho de playlist. Esse passo constitui um primeiro degrau para a ampliação do projeto.
+**Observação importante**: Apesar de ser levemente diferente do que é feito no resto das aplicações, para um sistema integrado completo, é muito útil poder ordenar os resultados por tamanho de playlist. Esse passo constitui um primeiro degrau para uma ampliação do projeto.
+
 ---
 
 ### 3.4 TAD PlayList (Lista Duplamente Encadeada Ordenada)
