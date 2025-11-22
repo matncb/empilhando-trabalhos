@@ -48,7 +48,7 @@ void person_free(Person *person)
 // funções de set
 int person_set_name(Person *person, char *name)
 {
-    if (person == NULL)
+    if (person == NULL || name == NULL)
         return 1;
 
     if (person->name != NULL)
@@ -64,7 +64,7 @@ int person_set_name(Person *person, char *name)
 
 int person_set_tel(Person *person, char *tel)
 {
-    if (person == NULL)
+    if (person == NULL || tel == NULL)
         return 1;
 
     if (person->tel != NULL)
@@ -80,7 +80,7 @@ int person_set_tel(Person *person, char *tel)
 
 int person_set_email(Person *person, char *email)
 {
-    if (person == NULL)
+    if (person == NULL || email == NULL)
         return 1;
 
     if (person->email != NULL)

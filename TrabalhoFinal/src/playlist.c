@@ -50,7 +50,7 @@ void playlist_free(PlayList *playlist)
     if (!playlist)
         return;
 
-    if (playlist->elements == 0)
+    if (playlist->elements == 0 || !playlist->start)
     {
         free(playlist);
         return;
@@ -89,6 +89,12 @@ Music **playlist_songs(PlayList *playlist)
         return NULL;
 
     Element *aux = playlist->start;
+    if (!aux)
+    {
+        free(array);
+        return NULL;
+    }
+
     int i = 0;
 
     do
@@ -97,7 +103,7 @@ Music **playlist_songs(PlayList *playlist)
         aux = aux->next;
         i++;
 
-    } while (aux);
+    } while (aux && i < playlist->elements);
 
     return array;
 }

@@ -32,6 +32,7 @@ void free_split_strings(char **strings, int count);
 void ui_list_people(PopList *poplist);
 void ui_show_recommendations(Graph *graph, PopList *poplist, char *person_name);
 void ui_show_graph(Graph *graph, PopList *poplist);
+void ui_export_graph(Graph *graph, PopList *poplist);
 void ui_show_similar(Graph *graph, PopList *poplist, char *person_name);
 void ui_show_tree(Tree *tree);
 void ui_add_person(Graph *graph, PopList *poplist, Tree *tree, char *name, char *tel, char *email);

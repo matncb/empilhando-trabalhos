@@ -10,8 +10,10 @@ Este projeto implementa um **Sistema de Recomendação Musical** que utiliza uma
 - **Calcular similaridades** entre pessoas baseado em músicas compartilhadas
 - **Gerar recomendações musicais** personalizadas para cada usuário
 - **Visualizar a rede de conexões** através de uma matriz de adjacência
+- **Exportar o grafo** para arquivo CSV para análise externa
 - **Organizar pessoas** por tamanho de playlist usando uma árvore AVL
 - **Gerenciar playlists** de forma dinâmica (adicionar/remover músicas)
+- **Redimensionar o grafo automaticamente** quando novas pessoas são adicionadas
 
 ### 1.2 Objetivos do Projeto
 
@@ -126,12 +128,25 @@ A escolha pela **matriz de adjacência** foi fundamentada nas seguintes razões:
 **Atualização do Grafo (`graph_update`)**
 - Recalcula todas as similaridades entre todos os pares de pessoas
 - Utiliza dois loops aninhados para comparar cada par
+- **Redimensiona o grafo automaticamente** se o número de pessoas exceder o tamanho atual
+- Utiliza crescimento exponencial para evitar realocações frequentes
 - Complexidade: O(V² × M²), onde V é número de pessoas e M é tamanho médio das playlists
 
+**Redimensionamento Dinâmico (`graph_resize`)**
+- Redimensiona a matriz de adjacência quando necessário
+- **Estratégia de crescimento exponencial**: Dobra o tamanho atual até atender à necessidade
+- Evita realocações frequentes quando pessoas são adicionadas
+- Preserva todos os dados existentes durante o redimensionamento
+- Complexidade: O(N²), onde N é o novo tamanho calculado
+- **Exemplo**: Se o grafo tem 100 vértices e precisa de 101, cresce para 200 (não apenas 101)
+
 **Exportação (`export_graph`)**
-- Exporta a matriz de adjacência para um arquivo CSV
+- Exporta a matriz de adjacência para um arquivo CSV (`graph.csv`)
 - Permite visualização externa da rede de conexões
+- Redimensiona o grafo automaticamente se necessário antes de exportar
+- Exporta apenas até o número de pessoas cadastradas (não inclui espaços vazios)
 - Complexidade: O(V²)
+- **Comando na interface**: `export` - Executa a exportação do grafo para CSV
 
 #### 3.1.4 Uso no Sistema
 
@@ -588,40 +603,112 @@ while (queue_get_elements(queue) < 5 && attempts < max_attempts) {
 
 #### 4.3.1 Descrição
 
-Quando uma pessoa adiciona ou remove músicas, o sistema precisa:
+O sistema mantém sincronização entre todas as estruturas de dados quando pessoas ou músicas são adicionadas/removidas. Isso envolve:
 
 1. **Atualizar a árvore AVL**: Remover pessoa com tamanho antigo, adicionar com tamanho novo
 2. **Recalcular similaridades**: Atualizar todas as arestas do grafo relacionadas à pessoa
-3. **Manter consistência**: Garantir que todas as estruturas estão sincronizadas
+3. **Redimensionar o grafo**: Se necessário, expandir a matriz de adjacência
+4. **Manter consistência**: Garantir que todas as estruturas estão sincronizadas
 
-#### 4.3.2 Fluxo de Atualização
+#### 4.3.2 Adição de Pessoa
+
+Quando uma nova pessoa é adicionada ao sistema:
+
+```c
+void ui_add_person(...) {
+    // 1. Cria pessoa e playlist vazia
+    Person *person = person_create(name, tel, email);
+    PlayList *playlist = playlist_create();
+    person_set_playlist(person, playlist);
+    
+    // 2. Adiciona à PopList
+    poplist_add(poplist, person);
+    
+    // 3. Adiciona à árvore AVL (tamanho 0 inicialmente)
+    tree_add(tree, person);
+    
+    // 4. Atualiza o grafo (recalcula similaridades e redimensiona se necessário)
+    graph_update(graph, poplist);
+}
+```
+
+**Processo de atualização do grafo durante adição:**
+1. Verifica se `n_pessoas > vertex_qnt`
+2. Se sim, redimensiona usando crescimento exponencial (dobra o tamanho)
+3. Recalcula todas as similaridades entre todos os pares de pessoas
+4. Atualiza a matriz de adjacência
+
+**Vantagens do crescimento exponencial:**
+- Evita realocações frequentes quando múltiplas pessoas são adicionadas
+- Se o grafo tem 100 vértices e precisa de 101, cresce para 200
+- Próximas adições até 200 não requerem redimensionamento
+- Reduz custo amortizado de O(n) realocações para O(log n)
+
+#### 4.3.3 Remoção de Pessoa
+
+Quando uma pessoa é removida:
+
+```c
+void ui_remove_person(...) {
+    // 1. Obtém tamanho da playlist antes de remover
+    PlayList *pl = person_get_playlist(person);
+    int playlist_size = playlist_get_elements(pl);
+    
+    // 2. Remove da PopList
+    poplist_remove_by_name(poplist, name);
+    
+    // 3. Remove da árvore AVL
+    tree_remove(tree, playlist_size);
+    
+    // 4. Atualiza o grafo (recalcula similaridades)
+    graph_update(graph, poplist);
+}
+```
+
+**Observação importante**: O grafo não é reduzido quando pessoas são removidas. A matriz mantém seu tamanho atual, mas apenas as pessoas existentes são consideradas nos cálculos. Isso evita realocações desnecessárias e mantém espaço para futuras adições.
+
+#### 4.3.4 Adição/Remoção de Música
+
+Quando uma música é adicionada ou removida de uma playlist:
 
 ```c
 void ui_add_music(...) {
-    // 1. Adiciona música à playlist
+    // 1. Obtém tamanho antigo
+    int old_size = playlist_get_elements(playlist);
+    
+    // 2. Adiciona música
     playlist_add(playlist, music);
     
-    // 2. Verifica se tamanho mudou
-    int old_size = playlist_get_elements(playlist);
+    // 3. Obtém novo tamanho
     int new_size = playlist_get_elements(playlist);
     
+    // 4. Se tamanho mudou, atualiza estruturas
     if (old_size != new_size) {
-        // 3. Atualiza árvore AVL
+        // Atualiza árvore AVL
         tree_remove(tree, old_size);
         tree_add(tree, person);
         
-        // 4. Recalcula todas as similaridades
+        // Recalcula todas as similaridades
         graph_update(graph, poplist);
     }
 }
 ```
 
-#### 4.3.3 Complexidade
+**Por que recalcular todas as similaridades?**
+- Quando uma pessoa adiciona/remove músicas, suas similaridades com TODAS as outras pessoas podem mudar
+- A implementação atual recalcula tudo para garantir consistência total
+- Uma otimização futura seria recalcular apenas as arestas relacionadas à pessoa modificada (O(V) ao invés de O(V²))
 
-- **Tempo**: O(V² × M²) para recalcular similaridades
-- **Espaço**: O(1) adicional
+#### 4.3.5 Complexidade
 
-**Nota**: A recalculação completa pode ser custosa, mas garante consistência. Uma otimização futura seria recalcular apenas as arestas relacionadas à pessoa modificada.
+| Operação | Complexidade | Justificativa |
+|----------|--------------|---------------|
+| Adicionar pessoa | O(n + log n + V²×M²) | Inserção na PopList + inserção na árvore + atualização do grafo |
+| Remover pessoa | O(n + log n + V²×M²) | Remoção da PopList + remoção da árvore + atualização do grafo |
+| Adicionar música | O(m + log n + V²×M²) | Inserção na playlist + atualização da árvore + atualização do grafo |
+| Redimensionar grafo | O(N²) | Onde N é o novo tamanho (crescimento exponencial reduz frequência) |
+
+**Nota sobre redimensionamento**: O crescimento exponencial garante que o número de redimensionamentos seja O(log n) para n adições, resultando em complexidade amortizada O(n²) para n adições, ao invés de O(n³) se redimensionasse de um em um.
 
 ---
 
@@ -682,13 +769,14 @@ void ui_add_music(...) {
 3. ✅ **similar <nome>**: Mostra pessoas similares
 4. ✅ **graph**: Visualiza matriz de adjacência
 5. ✅ **tree**: Visualiza árvore AVL ordenada
-6. ✅ **add_person**: Adiciona nova pessoa
-7. ✅ **remove_person**: Remove pessoa
-8. ✅ **add_music**: Adiciona música à playlist
-9. ✅ **remove_music**: Remove música da playlist
-10. ✅ **playlist <nome>**: Mostra playlist de uma pessoa
-11. ✅ **help**: Mostra ajuda
-12. ✅ **off**: Encerra programa
+6. ✅ **export**: Exporta grafo para arquivo CSV (graph.csv)
+7. ✅ **add_person**: Adiciona nova pessoa
+8. ✅ **remove_person**: Remove pessoa
+9. ✅ **add_music**: Adiciona música à playlist
+10. ✅ **remove_music**: Remove música da playlist
+11. ✅ **playlist <nome>**: Mostra playlist de uma pessoa
+12. ✅ **help**: Mostra ajuda
+13. ✅ **off**: Encerra programa
 
 ---
 
@@ -749,6 +837,27 @@ void ui_add_music(...) {
 - Recalcular apenas arestas relacionadas à pessoa modificada
 - Reduziria complexidade de O(V²) para O(V)
 
+### 6.5 Estratégia de Redimensionamento do Grafo
+
+**Decisão**: Crescimento exponencial (dobrar o tamanho quando necessário)
+
+**Justificativa**:
+- **Eficiência**: Evita realocações frequentes quando múltiplas pessoas são adicionadas
+- **Complexidade amortizada**: O(n²) para n adições, ao invés de O(n³) se redimensionasse de um em um
+- **Prática comum**: Estratégia amplamente utilizada em estruturas dinâmicas (ex: `std::vector` em C++)
+- **Balanceamento**: Reduz frequência de realocações sem desperdiçar muito espaço
+
+**Como funciona**:
+- Se o grafo tem tamanho S e precisa de tamanho N > S
+- Calcula novo tamanho: dobra S até que seja ≥ N
+- Exemplo: S=100, N=101 → novo tamanho = 200
+- Próximas adições até 200 não requerem redimensionamento
+
+**Alternativas consideradas**:
+- Crescimento linear (adicionar 10 por vez): Ainda requer muitas realocações
+- Crescimento exato (exatamente o necessário): Muito ineficiente, realoca a cada adição
+- Crescimento exponencial: Melhor balanceamento entre eficiência e uso de memória
+
 ---
 
 ## 7. Complexidade Geral do Sistema
@@ -760,9 +869,11 @@ void ui_add_music(...) {
 | Adicionar pessoa | O(n + log n + V²×M²) | Inserção na PopList + inserção na árvore + atualização do grafo |
 | Remover pessoa | O(n + log n + V²×M²) | Remoção da PopList + remoção da árvore + atualização do grafo |
 | Adicionar música | O(m + log n + V²×M²) | Inserção na playlist + atualização da árvore + atualização do grafo |
+| Redimensionar grafo | O(N²) amortizado | Onde N é o novo tamanho; crescimento exponencial reduz frequência |
 | Gerar recomendações | O(C² + R×M) | Ordenação de candidatos + seleção de músicas |
 | Buscar similares | O(V) | Percorre todas as pessoas |
 | Visualizar grafo | O(V²) | Percorre matriz de adjacência |
+| Exportar grafo | O(V²) | Escreve matriz completa no arquivo CSV |
 
 Onde:
 - n = número de pessoas
@@ -811,12 +922,33 @@ O sistema atende todos os requisitos obrigatórios e oferece funcionalidades adi
 - Balanceamento AVL (rotações simples e duplas)
 - Atualização dinâmica de estruturas
 
-### 9.3 Tratamento de Erros
+### 9.3 Tratamento de Erros e Segurança
 
-- Verificação de ponteiros nulos
-- Validação de parâmetros
-- Tratamento de memória insuficiente
-- Mensagens de erro informativas
+#### 9.3.1 Validações Implementadas
+
+- **Verificação de ponteiros nulos**: Todas as funções verificam ponteiros antes de uso
+- **Validação de parâmetros**: Entradas são validadas antes de processamento
+- **Tratamento de memória insuficiente**: Verificações de `malloc` e `realloc`
+- **Mensagens de erro informativas**: Usuário recebe feedback claro sobre erros
+
+#### 9.3.2 Proteções contra Buffer Overflow
+
+- **`string_split`**: Usa `strncpy` com limite para evitar overflow
+- **Validação de tamanho de strings**: Strings são truncadas se excederem `MAX_CMD_LENGTH`
+- **Verificação de limites de arrays**: Arrays fixos têm verificações de limites
+
+#### 9.3.3 Proteções de Memória
+
+- **Verificação de `strdup` com NULL**: Evita comportamento indefinido
+- **Validação antes de acesso a listas**: Verifica se `start` é NULL antes de percorrer
+- **Limites em loops**: Loops têm verificações para evitar acesso fora dos limites
+- **Divisão por zero**: Verificações antes de operações que podem causar divisão por zero
+
+#### 9.3.4 Redimensionamento Seguro
+
+- **Verificação de overflow**: Crescimento exponencial verifica overflow de multiplicação
+- **Liberação de memória**: Em caso de falha, toda memória alocada é liberada
+- **Preservação de dados**: Durante redimensionamento, dados existentes são preservados
 
 ---
 

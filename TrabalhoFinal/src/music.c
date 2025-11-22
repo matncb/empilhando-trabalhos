@@ -43,7 +43,7 @@ void music_free(Music *music)
 // funções de set
 int music_set_name(Music *music, char *name)
 {
-    if(music == NULL) return 1;
+    if(music == NULL || name == NULL) return 1;
     
     if (music->name != NULL) {
         free(music->name);
@@ -56,7 +56,7 @@ int music_set_name(Music *music, char *name)
 
 int music_set_artist(Music *music, char *artist)
 {
-    if(music == NULL) return 1;
+    if(music == NULL || artist == NULL) return 1;
 
     if (music->artist != NULL) {
         free(music->artist);
@@ -69,7 +69,7 @@ int music_set_artist(Music *music, char *artist)
 
 int music_set_comment(Music *music, char *comment)
 {
-    if(music == NULL) return 1;
+    if(music == NULL || comment == NULL) return 1;
 
     if (music->comment != NULL) {
         free(music->comment);

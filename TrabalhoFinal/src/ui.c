@@ -42,7 +42,8 @@ char **string_split(char *string, char *delimiter, int *count)
             return NULL;
         }
 
-        strcpy(strings[cmd_qnt], splited);
+        strncpy(strings[cmd_qnt], splited, MAX_CMD_LENGTH - 1);
+        strings[cmd_qnt][MAX_CMD_LENGTH - 1] = '\0';
         splited = strtok(NULL, delimiter);
         cmd_qnt++;
     }
@@ -139,7 +140,7 @@ Queue *ui_generate_recommendations(Graph *graph, PopList *poplist, int person_id
     int candidates_count = 0;
     
 
-    for (int i = 0; i < n && i < vertex_qnt; i++)
+    for (int i = 0; i < n && i < vertex_qnt && candidates_count < 100; i++)
     {
         if (i == person_idx)
             continue;
@@ -190,6 +191,15 @@ Queue *ui_generate_recommendations(Graph *graph, PopList *poplist, int person_id
     for (int i = 0; i < top_count; i++)
     {
         total_weight += weights[i];
+    }
+
+    if (total_weight == 0)
+    {
+        if (person_songs)
+            free(person_songs);
+        free(people);
+        queue_free(queue);
+        return queue;
     }
 
     int max_recommendations = 5;
@@ -678,6 +688,26 @@ void ui_show_playlist(PopList *poplist, char *person_name)
     return;
 }
 
+void ui_export_graph(Graph *graph, PopList *poplist)
+{
+    if (!graph || !poplist)
+    {
+        printf("Grafo ou lista de pessoas invalidos.\n");
+        return;
+    }
+
+    int result = export_graph(graph, poplist);
+    if (result == 0)
+    {
+        printf("Grafo exportado para graph.csv com sucesso.\n");
+    }
+    else
+    {
+        printf("Erro ao exportar grafo.\n");
+    }
+    return;
+}
+
 void ui_show_help()
 {
     printf("Comandos disponiveis:\n");
@@ -686,6 +716,7 @@ void ui_show_help()
     printf("  similar <nome> - Mostra pessoas similares\n");
     printf("  graph - Mostra matriz de adjacencia\n");
     printf("  tree - Mostra arvore AVL\n");
+    printf("  export - Exporta grafo para graph.csv\n");
     printf("  add_person <nome> <telefone> <email> - Adiciona nova pessoa\n");
     printf("  remove_person <nome> - Remove uma pessoa\n");
     printf("  add_music <nome_pessoa> <nome_musica> <artista> - Adiciona musica a playlist\n");
@@ -715,7 +746,8 @@ void ui_run(Graph *graph, PopList *poplist, Tree *tree)
 
         if (command_qnt == 1)
         {
-            strings[0][strcspn(strings[0], END_LINE)] = '\0';
+            if (strings[0])
+                strings[0][strcspn(strings[0], END_LINE)] = '\0';
             if (!strcmp(strings[0], "list"))
             {
                 ui_list_people(poplist);
@@ -727,6 +759,10 @@ void ui_run(Graph *graph, PopList *poplist, Tree *tree)
             else if (!strcmp(strings[0], "tree"))
             {
                 ui_show_tree(tree);
+            }
+            else if (!strcmp(strings[0], "export"))
+            {
+                ui_export_graph(graph, poplist);
             }
             else if (!strcmp(strings[0], "help"))
             {
@@ -744,7 +780,8 @@ void ui_run(Graph *graph, PopList *poplist, Tree *tree)
         }
         else if (command_qnt == 2)
         {
-            strings[1][strcspn(strings[1], END_LINE)] = '\0';
+            if (strings[1])
+                strings[1][strcspn(strings[1], END_LINE)] = '\0';
             if (!strcmp(strings[0], "recommend"))
             {
                 ui_show_recommendations(graph, poplist, strings[1]);
@@ -768,7 +805,8 @@ void ui_run(Graph *graph, PopList *poplist, Tree *tree)
         }
         else if (command_qnt == 3)
         {
-            strings[2][strcspn(strings[2], END_LINE)] = '\0';
+            if (strings[2])
+                strings[2][strcspn(strings[2], END_LINE)] = '\0';
             if (!strcmp(strings[0], "remove_music"))
             {
                 ui_remove_music(graph, poplist, tree, strings[1], strings[2]);
@@ -780,7 +818,8 @@ void ui_run(Graph *graph, PopList *poplist, Tree *tree)
         }
         else if (command_qnt == 4)
         {
-            strings[3][strcspn(strings[3], END_LINE)] = '\0';
+            if (strings[3])
+                strings[3][strcspn(strings[3], END_LINE)] = '\0';
             if (!strcmp(strings[0], "add_person"))
             {
                 ui_add_person(graph, poplist, tree, strings[1], strings[2], strings[3]);

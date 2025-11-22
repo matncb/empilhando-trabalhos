@@ -50,7 +50,7 @@ void poplist_free(PopList *poplist)
     if (!poplist)
         return;
 
-    if (poplist->elements == 0)
+    if (poplist->elements == 0 || !poplist->start)
     {
         free(poplist);
         return;
@@ -89,6 +89,12 @@ Person **poplist_people(PopList *poplist)
         return NULL;
 
     Element *aux = poplist->start;
+    if (!aux)
+    {
+        free(array);
+        return NULL;
+    }
+
     int i = 0;
 
     do
@@ -97,7 +103,7 @@ Person **poplist_people(PopList *poplist)
         aux = aux->next;
         i++;
 
-    } while (aux);
+    } while (aux && i < poplist->elements);
 
     return array;
 }

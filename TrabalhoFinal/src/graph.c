@@ -80,8 +80,21 @@ int export_graph(Graph *graph, PopList *poplist) {
     int n_people = poplist_get_elements(poplist);
     int vertex_qnt = graph_get_vertex_qnt(graph);
     
+    if (n_people > vertex_qnt)
+    {
+        if (graph_resize(graph, n_people) != 0)
+        {
+            if (people) free(people);
+            fclose(file);
+            return 1;
+        }
+        vertex_qnt = graph_get_vertex_qnt(graph);
+    }
+    
+    int export_size = n_people;
+    
     fprintf(file, ",");
-    for (int j = 0; j < vertex_qnt; j++) {
+    for (int j = 0; j < export_size; j++) {
         if (j < n_people && people[j]) {
             char *name = person_get_name(people[j]);
             if (name) {
@@ -92,13 +105,13 @@ int export_graph(Graph *graph, PopList *poplist) {
         } else {
             fprintf(file, "Pessoa_%d", j);
         }
-        if (j < vertex_qnt - 1) {
+        if (j < export_size - 1) {
             fprintf(file, ",");
         }
     }
     fprintf(file, "\n");
 
-    for (int i = 0; i < vertex_qnt; i++) {
+    for (int i = 0; i < export_size; i++) {
         if (i < n_people && people[i]) {
             char *name = person_get_name(people[i]);
             if (name) {
@@ -111,10 +124,10 @@ int export_graph(Graph *graph, PopList *poplist) {
         }
         fprintf(file, ",");
         
-        for (int j = 0; j < vertex_qnt; j++) {
+        for (int j = 0; j < export_size; j++) {
             fprintf(file, "%d", graph_get_edge_weight(graph, i, j));
             
-            if (j < vertex_qnt - 1) {
+            if (j < export_size - 1) {
                 fprintf(file, ",");
             }
         }
@@ -137,11 +150,19 @@ void graph_update(Graph *graph, PopList *list)
     int n = poplist_get_elements(list);
     if (n <= 0) return;
     
+    if (n > graph->vertex_qnt)
+    {
+        if (graph_resize(graph, n) != 0)
+        {
+            return;
+        }
+    }
+    
     Person **people = poplist_people(list);
     if (!people) return;
     
-    for (int i = 0; i < n && i < graph->vertex_qnt; i++) {
-        for (int j = i + 1; j < n && j < graph->vertex_qnt; j++) {
+    for (int i = 0; i < n; i++) {
+        for (int j = i + 1; j < n; j++) {
             int similarity = calculate_similarity(people[i], people[j]);
             graph_update_edges(graph, i, j, similarity);
         }
@@ -200,4 +221,65 @@ int graph_get_edge_weight(Graph *graph, int src, int dest)
     if (!graph || !graph->adjMatrix) return 0;
     if (src < 0 || src >= graph->vertex_qnt || dest < 0 || dest >= graph->vertex_qnt) return 0;
     return graph->adjMatrix[src][dest];
+}
+
+int graph_resize(Graph *graph, int new_size)
+{
+    if (!graph || new_size <= 0) return 1;
+    if (new_size <= graph->vertex_qnt) return 0;
+
+    int old_size = graph->vertex_qnt;
+    int calculated_size = old_size;
+    
+    while (calculated_size < new_size)
+    {
+        calculated_size = calculated_size * 2;
+        if (calculated_size < old_size)
+        {
+            calculated_size = new_size;
+            break;
+        }
+    }
+    
+    int **new_matrix = (int**)malloc(calculated_size * sizeof(int*));
+    if (!new_matrix) return 1;
+
+    for (int i = 0; i < calculated_size; i++)
+    {
+        new_matrix[i] = (int*)malloc(calculated_size * sizeof(int));
+        if (!new_matrix[i])
+        {
+            for (int j = 0; j < i; j++)
+            {
+                free(new_matrix[j]);
+            }
+            free(new_matrix);
+            return 1;
+        }
+
+        for (int j = 0; j < calculated_size; j++)
+        {
+            if (i < old_size && j < old_size)
+            {
+                new_matrix[i][j] = graph->adjMatrix[i][j];
+            }
+            else
+            {
+                new_matrix[i][j] = 0;
+            }
+        }
+    }
+
+    if (graph->adjMatrix)
+    {
+        for (int i = 0; i < old_size; i++)
+        {
+            free(graph->adjMatrix[i]);
+        }
+        free(graph->adjMatrix);
+    }
+
+    graph->adjMatrix = new_matrix;
+    graph->vertex_qnt = calculated_size;
+    return 0;
 }

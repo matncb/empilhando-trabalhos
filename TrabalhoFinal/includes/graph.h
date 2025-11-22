@@ -22,5 +22,6 @@ int export_graph(Graph *graph, PopList *poplist);
 int calculate_similarity(void *p1, void *p2);
 int graph_get_vertex_qnt(Graph *graph);
 int graph_get_edge_weight(Graph *graph, int src, int dest);
+int graph_resize(Graph *graph, int new_size);
 
 #endif
