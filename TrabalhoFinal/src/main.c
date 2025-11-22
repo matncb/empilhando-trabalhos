@@ -125,18 +125,8 @@ int main()
     export_graph(graph, poplist);
 
     printf("\n=== SISTEMA INTERATIVO ===\n");
-    printf("Comandos disponiveis:\n");
-    printf("  list - Lista todas as pessoas\n");
-    printf("  recommend <nome> - Mostra recomendacoes para uma pessoa\n");
-    printf("  similar <nome> - Mostra pessoas similares\n");
-    printf("  graph - Mostra matriz de adjacencia\n");
-    printf("  tree - Mostra arvore AVL\n");
-    printf("  add_person <nome> <telefone> <email> - Adiciona nova pessoa\n");
-    printf("  remove_person <nome> - Remove uma pessoa\n");
-    printf("  add_music <nome_pessoa> <nome_musica> <artista> - Adiciona musica a playlist\n");
-    printf("  remove_music <nome_pessoa> <nome_musica> - Remove musica da playlist\n");
-    printf("  playlist <nome> - Mostra musicas da playlist de uma pessoa\n");
-    printf("  off - Encerra o programa\n\n");
+    ui_show_help();
+    printf("\n");
 
     ui_run(graph, poplist, tree);
 

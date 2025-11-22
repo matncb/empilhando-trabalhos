@@ -678,6 +678,24 @@ void ui_show_playlist(PopList *poplist, char *person_name)
     return;
 }
 
+void ui_show_help()
+{
+    printf("Comandos disponiveis:\n");
+    printf("  list - Lista todas as pessoas\n");
+    printf("  recommend <nome> - Mostra recomendacoes para uma pessoa\n");
+    printf("  similar <nome> - Mostra pessoas similares\n");
+    printf("  graph - Mostra matriz de adjacencia\n");
+    printf("  tree - Mostra arvore AVL\n");
+    printf("  add_person <nome> <telefone> <email> - Adiciona nova pessoa\n");
+    printf("  remove_person <nome> - Remove uma pessoa\n");
+    printf("  add_music <nome_pessoa> <nome_musica> <artista> - Adiciona musica a playlist\n");
+    printf("  remove_music <nome_pessoa> <nome_musica> - Remove musica da playlist\n");
+    printf("  playlist <nome> - Mostra musicas da playlist de uma pessoa\n");
+    printf("  help - Mostra esta lista de comandos\n");
+    printf("  off - Encerra o programa\n");
+    return;
+}
+
 void ui_run(Graph *graph, PopList *poplist, Tree *tree)
 {
     char command[FULL_CMD_LENGTH];
@@ -709,6 +727,10 @@ void ui_run(Graph *graph, PopList *poplist, Tree *tree)
             else if (!strcmp(strings[0], "tree"))
             {
                 ui_show_tree(tree);
+            }
+            else if (!strcmp(strings[0], "help"))
+            {
+                ui_show_help();
             }
             else if (!strcmp(strings[0], "off"))
             {

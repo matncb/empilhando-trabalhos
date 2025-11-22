@@ -39,6 +39,7 @@ void ui_remove_person(Graph *graph, PopList *poplist, Tree *tree, char *name);
 void ui_add_music(Graph *graph, PopList *poplist, Tree *tree, char *person_name, char *music_name, char *artist);
 void ui_remove_music(Graph *graph, PopList *poplist, Tree *tree, char *person_name, char *music_name);
 void ui_show_playlist(PopList *poplist, char *person_name);
+void ui_show_help(void);
 
 #endif
 
