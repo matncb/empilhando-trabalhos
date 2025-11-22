@@ -23,7 +23,7 @@ typedef struct PlayList
 
 } PlayList;
 
-static void playlist_element_free(Element *aux)
+void playlist_element_free(Element *aux)
 {
     if (aux == NULL)
         return;

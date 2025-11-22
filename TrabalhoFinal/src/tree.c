@@ -11,6 +11,7 @@ typedef struct Element
     struct Element *right;
 
     Person *person;
+    int balance_factor;
 
 } Element;
 
@@ -20,7 +21,7 @@ typedef struct Tree
     int elements;
 } Tree;
 
-int get_playlist_size(Person *person)
+int tree_get_playlist_size(Person *person)
 {
     if (!person) return 0;
     PlayList *pl = (PlayList *)person_get_playlist(person);
@@ -28,22 +29,21 @@ int get_playlist_size(Person *person)
     return playlist_get_elements(pl);
 }
 
-static void tree_element_free(Element *aux)
+void tree_element_free(Element *aux)
 {
     if (aux == NULL) return;
-    // Não libera person aqui, pois pode ser compartilhado com poplist
-    // A liberação será feita pela poplist
     free(aux);
     return;
 }
 
-Element *element_create(Person *person)
+Element *tree_element_create(Person *person)
 {
     if (!person) return NULL;
     Element *aux = (Element*) malloc(sizeof(Element));
     if (!aux) return NULL;
 
     aux->person = person;
+    aux->balance_factor = 0;
 
     aux->left = NULL;
     aux->right  = NULL;
@@ -139,169 +139,215 @@ Person **tree_list(Tree *tree, PathType path)
     return list;
 }
 
-
-void tree_node_search_by_playlist_size_recursive(Element *node, int size, Element **out_element, bool *found, Element **parent)
+int tree_max(int a, int b)
 {
-    int node_size = get_playlist_size(node->person);
-    
-    if(node_size == size){
-        *out_element = node;
-        *found = true;
-        return;
-    }
+    return (a > b) ? a : b;
+}
 
-    if(node_size < size)
+int tree_calculate_height(Element *node)
+{
+    if (node == NULL) return -1;
+    return 1 + tree_max(tree_calculate_height(node->left), tree_calculate_height(node->right));
+}
+
+int tree_calculate_balance_factor(Element *node)
+{
+    if (node == NULL) return 0;
+    int height_right = tree_calculate_height(node->right);
+    int height_left = tree_calculate_height(node->left);
+    return height_right - height_left;
+}
+
+void tree_update_balance_factor(Element *node)
+{
+    if (node == NULL) return;
+    node->balance_factor = tree_calculate_balance_factor(node);
+}
+
+Element *tree_rotate_right(Element *y)
+{
+    Element *x = y->left;
+    Element *T2 = x->right;
+
+    x->right = y;
+    y->left = T2;
+
+    tree_update_balance_factor(y);
+    tree_update_balance_factor(x);
+
+    return x;
+}
+
+Element *tree_rotate_left(Element *x)
+{
+    Element *y = x->right;
+    Element *T2 = y->left;
+
+    y->left = x;
+    x->right = T2;
+
+    tree_update_balance_factor(x);
+    tree_update_balance_factor(y);
+
+    return y;
+}
+
+Element *tree_balance_node(Element *node)
+{
+    if (node == NULL) return NULL;
+
+    tree_update_balance_factor(node);
+    int bf = node->balance_factor;
+
+    if (bf > 1)
     {
-        if (node->right == NULL)
+        if (node->right != NULL && node->right->balance_factor >= 0)
+            return tree_rotate_left(node);
+        
+        if (node->right != NULL && node->right->balance_factor < 0)
         {
-            *out_element = node;
-            *found = false;
-            return;
+            node->right = tree_rotate_right(node->right);
+            return tree_rotate_left(node);
         }
-        *parent = node;
-        return tree_node_search_by_playlist_size_recursive(node->right, size, out_element, found, parent);
     }
 
-    if (node->left == NULL)
+    if (bf < -1)
     {
-        *out_element = node;
-        *found = false;
-        return;
+        if (node->left != NULL && node->left->balance_factor <= 0)
+            return tree_rotate_right(node);
+        
+        if (node->left != NULL && node->left->balance_factor > 0)
+        {
+            node->left = tree_rotate_left(node->left);
+            return tree_rotate_right(node);
+        }
     }
-    *parent = node;
-    return tree_node_search_by_playlist_size_recursive(node->left, size, out_element, found, parent);
+
+    return node;
 }
 
-Element *tree_search_by_playlist_size(Tree *tree, int size, bool *found, Element **parent)
+int tree_compare_by_playlist_size(Person *person1, int size)
 {
-    if (tree == NULL || tree->root == NULL) return NULL;
-
-    Element *out_element = NULL;
-    tree_node_search_by_playlist_size_recursive(tree->root, size, &out_element, found, parent);
-    return out_element;
+    int size1 = tree_get_playlist_size(person1);
+    
+    if (size1 < size)
+        return -1;
+    else if (size1 > size)
+        return 1;
+    
+    return 0;
 }
 
-Person *tree_search_by_playlist_size_pure(Tree *tree, int playlist_size) 
+Element *tree_add_recursive(Element *node, Person *person, bool *already_exists)
 {
-    if (tree == NULL || tree -> root == NULL) return NULL;
-    bool found = false;
-    Element *out_element = NULL;
-    Element *parent = NULL;
-    tree_node_search_by_playlist_size_recursive(tree->root, playlist_size, &out_element, &found, &parent);
-    if (found)
-        return out_element->person;
+    if (node == NULL)
+    {
+        Element *new_node = tree_element_create(person);
+        if (new_node == NULL)
+        {
+            *already_exists = false;
+            return NULL;
+        }
+        return new_node;
+    }
 
-    return NULL;
+    int node_size = tree_get_playlist_size(node->person);
+    int compair = tree_compare_by_playlist_size(person, node_size);
+
+    if (compair == 0)
+    {
+        *already_exists = true;
+        return node;
+    }
+
+    if (compair < 0)
+        node->left = tree_add_recursive(node->left, person, already_exists);
+    else
+        node->right = tree_add_recursive(node->right, person, already_exists);
+
+    return tree_balance_node(node);
 }
 
 int tree_add(Tree *tree, Person *person)
 {
     if (tree == NULL) return 2;
 
-    int person_size = get_playlist_size(person);
-    bool found = false;
-    Element *parent = NULL;
+    bool already_exists = false;
+    tree->root = tree_add_recursive(tree->root, person, &already_exists);
 
-    Element *search = tree_search_by_playlist_size(tree, person_size, &found, &parent);
-    if (found) return 1; // Já existe pessoa com mesmo tamanho de playlist
-
-   
-    Element *node = element_create(person);
-    if (!node) return 2;
-
-    if (search == NULL)
-    {
-        tree->root = node;
-        tree->elements++;
-        return 0;
-    }
-
-    int search_size = get_playlist_size(search->person);
-
-    if (person_size < search_size)
-    {
-       search->left = node;
-    }
-    else
-    {
-        search->right = node;
-    }
+    if (already_exists) return 1;
+    if (tree->root == NULL) return 2;
 
     tree->elements++;
     return 0;
 }
 
-void tree_node_search_max_recursive(Element *node, Element **out_element,  Element **parent)
+Element *tree_find_min_node(Element *node)
 {
-    *out_element = node;
-    if (!node->right) return ;
-    *parent = node;
-    tree_node_search_max_recursive(node->right, out_element, parent);
+    Element *current = node;
+    while (current && current->left != NULL)
+        current = current->left;
+    return current;
 }
 
-int tree_remove_node(Tree *tree, Element *search, Element *parent)
+Element *tree_remove_recursive(Element *node, int playlist_size, bool *found, Person **removed_person)
 {
-    if ((!search->left) && (!search->right))
+    if (node == NULL)
     {
-        if (!parent)
-        {
-            tree->root = NULL;
-        }
-        else if (parent->right == search)
-        {
-            parent->right = NULL;
-        }
-        else
-        {
-            parent->left = NULL;
-        }
-
-        tree_element_free(search);
-        tree->elements--;
-        return 0;
+        *found = false;
+        return NULL;
     }
 
-    if ((!search->left) && (search->right))
+    int compair = tree_compare_by_playlist_size(node->person, playlist_size);
+
+    if (compair == 0)
     {
-        if (!parent)
+        *found = true;
+
+        if (node->left == NULL)
         {
-            tree->root = search->right;
+            Element *temp = node->right;
+            *removed_person = node->person;
+            free(node);
+            return temp;
         }
-        else if (parent->right == search)
+        else if (node->right == NULL)
         {
-            parent->right = search->right;
-        }
-        else
-        {
-            parent->left = search->right;
+            Element *temp = node->left;
+            *removed_person = node->person;
+            free(node);
+            return temp;
         }
 
-        tree_element_free(search);
-        tree->elements--;
-        return 0;
+        Element *min_node = tree_find_min_node(node->right);
+        *removed_person = node->person;
+        node->person = min_node->person;
+
+        bool temp_found;
+        Person *temp_person = NULL;
+        int min_size = tree_get_playlist_size(min_node->person);
+        node->right = tree_remove_recursive(node->right, min_size, &temp_found, &temp_person);
+    }
+    else if (compair < 0)
+    {
+        Person *temp_person = NULL;
+        node->right = tree_remove_recursive(node->right, playlist_size, found, &temp_person);
+        if (*found)
+        {
+            *removed_person = temp_person;
+        }
+    }
+    else
+    {
+        Person *temp_person = NULL;
+        node->left = tree_remove_recursive(node->left, playlist_size, found, &temp_person);
+        if (*found)
+        {
+            *removed_person = temp_person;
+        }
     }
 
-    if ((search->left) && (!search->right))
-    {
-        if (!parent)
-        {
-            tree->root = search->left;
-        }
-        else if (parent->right == search)
-        {
-            parent->right = search->left;
-        }
-        else
-        {
-            parent->left = search->left;
-        }
-
-        tree_element_free(search);
-        tree->elements--;
-        return 0;
-    }
-
-    return 1;
+    return tree_balance_node(node);
 }
 
 int tree_remove(Tree *tree, int playlist_size)
@@ -309,25 +355,47 @@ int tree_remove(Tree *tree, int playlist_size)
     if (tree == NULL) return 2;
 
     bool found = false;
-    Element *parent = NULL;
-
-    Element *search = tree_search_by_playlist_size(tree, playlist_size, &found, &parent);
-    if (!found) return 1;
-
-    if (!tree_remove_node(tree,search, parent)) return 0;
+    Person *removed_person = NULL;
     
-    Element *new_root_parent = search;
-    Element *new_root = NULL;
+    tree->root = tree_remove_recursive(tree->root, playlist_size, &found, &removed_person);
 
-    tree_node_search_max_recursive(search->left, &new_root, &new_root_parent);
-
-    Person *aux = search->person;
-    search->person = new_root->person;
-    new_root->person = aux;
-
-    if (!tree_remove_node(tree, new_root, new_root_parent)) return 0;
-
-    return 1;
- 
+    if (!found) return 1;
+    
+    tree->elements--;
+    return 0;
 }
 
+Element *tree_search_recursive(Element *node, int playlist_size, bool *found)
+{
+    if (node == NULL)
+    {
+        *found = false;
+        return NULL;
+    }
+
+    int compair = tree_compare_by_playlist_size(node->person, playlist_size);
+
+    if (compair == 0)
+    {
+        *found = true;
+        return node;
+    }
+
+    if (compair < 0)
+        return tree_search_recursive(node->right, playlist_size, found);
+    else
+        return tree_search_recursive(node->left, playlist_size, found);
+}
+
+Person *tree_search_by_playlist_size(Tree *tree, int playlist_size)
+{
+    if (tree == NULL || tree->root == NULL) return NULL;
+
+    bool found = false;
+    Element *result = tree_search_recursive(tree->root, playlist_size, &found);
+    
+    if (found && result)
+        return result->person;
+
+    return NULL;
+}

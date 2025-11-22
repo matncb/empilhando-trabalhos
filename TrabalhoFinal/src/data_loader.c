@@ -6,7 +6,7 @@
 #define MAX_LINE_LENGTH 256
 #define INITIAL_CAPACITY 100
 
-static char **read_names_from_csv(const char *filename, int *count) {
+char **read_names_from_csv(char *filename, int *count) {
     FILE *file = fopen(filename, "r");
     if (!file) {
         perror("Erro ao abrir arquivo de nomes");
@@ -25,7 +25,6 @@ static char **read_names_from_csv(const char *filename, int *count) {
     }
 
     while (fgets(line, sizeof(line), file)) {
-        // Remove newline
         size_t len = strlen(line);
         if (len > 0 && line[len - 1] == '\n') {
             line[len - 1] = '\0';
@@ -34,15 +33,12 @@ static char **read_names_from_csv(const char *filename, int *count) {
             line[len - 1] = '\0';
         }
 
-        // Skip empty lines
         if (strlen(line) == 0) continue;
 
-        // Expand array if needed
         if (size >= capacity) {
             capacity *= 2;
             char **new_names = (char **)realloc(names, capacity * sizeof(char *));
             if (!new_names) {
-                // Free already allocated strings
                 for (int i = 0; i < size; i++) {
                     free(names[i]);
                 }
@@ -53,10 +49,8 @@ static char **read_names_from_csv(const char *filename, int *count) {
             names = new_names;
         }
 
-        // Allocate and copy name
         names[size] = strdup(line);
         if (!names[size]) {
-            // Free already allocated strings
             for (int i = 0; i < size; i++) {
                 free(names[i]);
             }
@@ -72,7 +66,7 @@ static char **read_names_from_csv(const char *filename, int *count) {
     return names;
 }
 
-static int read_songs_from_csv(const char *filename, char ***songs, char ***artists, int *count) {
+int read_songs_from_csv(char *filename, char ***songs, char ***artists, int *count) {
     FILE *file = fopen(filename, "r");
     if (!file) {
         perror("Erro ao abrir arquivo de músicas");
@@ -94,8 +88,12 @@ static int read_songs_from_csv(const char *filename, char ***songs, char ***arti
         return 1;
     }
 
+    int first_line = 1;
     while (fgets(line, sizeof(line), file)) {
-        // Remove newline
+        if (first_line) {
+            first_line = 0;
+            continue;
+        }
         size_t len = strlen(line);
         if (len > 0 && line[len - 1] == '\n') {
             line[len - 1] = '\0';
@@ -104,17 +102,13 @@ static int read_songs_from_csv(const char *filename, char ***songs, char ***arti
             line[len - 1] = '\0';
         }
 
-        // Skip empty lines
         if (strlen(line) == 0) continue;
 
-        // Find comma separator
         char *comma = strchr(line, ',');
         if (!comma) {
-            // No comma, treat entire line as song name, artist is "Unknown"
-            continue; // Skip malformed lines
+            continue;
         }
 
-        // Expand arrays if needed
         if (size >= capacity) {
             capacity *= 2;
             char **new_songs = (char **)realloc(song_list, capacity * sizeof(char *));
@@ -122,7 +116,6 @@ static int read_songs_from_csv(const char *filename, char ***songs, char ***arti
             if (!new_songs || !new_artists) {
                 if (new_songs) free(new_songs);
                 if (new_artists) free(new_artists);
-                // Free already allocated strings
                 for (int i = 0; i < size; i++) {
                     free(song_list[i]);
                     free(artist_list[i]);
@@ -136,12 +129,10 @@ static int read_songs_from_csv(const char *filename, char ***songs, char ***arti
             artist_list = new_artists;
         }
 
-        // Split line: song,artist
         *comma = '\0';
         char *song_name = line;
         char *artist_name = comma + 1;
 
-        // Trim whitespace
         while (*song_name == ' ') song_name++;
         while (*artist_name == ' ') artist_name++;
 
@@ -151,7 +142,6 @@ static int read_songs_from_csv(const char *filename, char ***songs, char ***arti
         if (!song_list[size] || !artist_list[size]) {
             if (song_list[size]) free(song_list[size]);
             if (artist_list[size]) free(artist_list[size]);
-            // Free already allocated strings
             for (int i = 0; i < size; i++) {
                 free(song_list[i]);
                 free(artist_list[i]);
@@ -171,7 +161,7 @@ static int read_songs_from_csv(const char *filename, char ***songs, char ***arti
     return 0;
 }
 
-DataBank *data_load_from_csv(const char *names_file, const char *songs_file) {
+DataBank *data_load_from_csv(char *names_file, char *songs_file) {
     DataBank *bank = (DataBank *)malloc(sizeof(DataBank));
     if (!bank) return NULL;
 
@@ -181,7 +171,6 @@ DataBank *data_load_from_csv(const char *names_file, const char *songs_file) {
     bank->name_count = 0;
     bank->song_count = 0;
 
-    // Load names
     bank->names = read_names_from_csv(names_file, &bank->name_count);
     if (!bank->names || bank->name_count == 0) {
         printf("Aviso: Nenhum nome carregado do arquivo %s\n", names_file);
@@ -195,10 +184,8 @@ DataBank *data_load_from_csv(const char *names_file, const char *songs_file) {
         return NULL;
     }
 
-    // Load songs
     if (read_songs_from_csv(songs_file, &bank->songs, &bank->artists, &bank->song_count) != 0) {
         printf("Aviso: Nenhuma música carregada do arquivo %s\n", songs_file);
-        // Free names
         for (int i = 0; i < bank->name_count; i++) {
             free(bank->names[i]);
         }
@@ -209,7 +196,6 @@ DataBank *data_load_from_csv(const char *names_file, const char *songs_file) {
 
     if (bank->song_count == 0) {
         printf("Aviso: Nenhuma música carregada do arquivo %s\n", songs_file);
-        // Free names
         for (int i = 0; i < bank->name_count; i++) {
             free(bank->names[i]);
         }
@@ -266,4 +252,16 @@ char *data_get_random_artist(DataBank *bank) {
     int index = rand() % bank->song_count;
     return bank->artists[index];
 }
+
+void data_get_random_song_pair(DataBank *bank, char **song, char **artist) {
+    if (!bank || !bank->songs || !bank->artists || bank->song_count == 0) {
+        *song = NULL;
+        *artist = NULL;
+        return;
+    }
+    int index = rand() % bank->song_count;
+    *song = bank->songs[index];
+    *artist = bank->artists[index];
+}
+
 

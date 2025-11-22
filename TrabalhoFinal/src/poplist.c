@@ -23,7 +23,7 @@ typedef struct PopList
 
 } PopList;
 
-static void poplist_element_free(Element *aux)
+void poplist_element_free(Element *aux)
 {
     if (aux == NULL)
         return;

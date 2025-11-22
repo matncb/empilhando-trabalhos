@@ -68,7 +68,7 @@ int export_graph(Graph *graph, PopList *poplist) {
 
     if (file == NULL) {
         perror("Erro ao abrir o arquivo para escrita");
-        return 1; // Retorna 1 indicando erro
+        return 1;
     }
 
     if (!graph || !poplist) {
@@ -76,13 +76,11 @@ int export_graph(Graph *graph, PopList *poplist) {
         return 1;
     }
 
-    // Obtém lista de pessoas
     Person **people = poplist_people(poplist);
     int n_people = poplist_get_elements(poplist);
     int vertex_qnt = graph_get_vertex_qnt(graph);
     
-    // Escreve cabeçalho: primeira linha com nomes
-    fprintf(file, ","); // Célula vazia no canto superior esquerdo
+    fprintf(file, ",");
     for (int j = 0; j < vertex_qnt; j++) {
         if (j < n_people && people[j]) {
             char *name = person_get_name(people[j]);
@@ -94,16 +92,13 @@ int export_graph(Graph *graph, PopList *poplist) {
         } else {
             fprintf(file, "Pessoa_%d", j);
         }
-        // Adiciona vírgula, exceto após o último elemento
         if (j < vertex_qnt - 1) {
             fprintf(file, ",");
         }
     }
     fprintf(file, "\n");
 
-    // Escreve a matriz com nomes na primeira coluna
     for (int i = 0; i < vertex_qnt; i++) {
-        // Primeira coluna: nome da pessoa
         if (i < n_people && people[i]) {
             char *name = person_get_name(people[i]);
             if (name) {
@@ -116,16 +111,13 @@ int export_graph(Graph *graph, PopList *poplist) {
         }
         fprintf(file, ",");
         
-        // Resto da linha: valores da matriz
         for (int j = 0; j < vertex_qnt; j++) {
             fprintf(file, "%d", graph_get_edge_weight(graph, i, j));
             
-            // Adiciona vírgula, exceto após o último elemento da linha
             if (j < vertex_qnt - 1) {
                 fprintf(file, ",");
             }
         }
-        // Adiciona uma nova linha ao final de cada linha da matriz
         fprintf(file, "\n");
     }
 
@@ -135,7 +127,7 @@ int export_graph(Graph *graph, PopList *poplist) {
 
     fclose(file);
     printf("Grafo exportado com sucesso para 'graph.csv'\n");
-    return 0; // Retorna 0 indicando sucesso
+    return 0;
 }
 
 void graph_update(Graph *graph, PopList *list)
@@ -148,7 +140,6 @@ void graph_update(Graph *graph, PopList *list)
     Person **people = poplist_people(list);
     if (!people) return;
     
-    // Calcula similaridade baseada em músicas em comum
     for (int i = 0; i < n && i < graph->vertex_qnt; i++) {
         for (int j = i + 1; j < n && j < graph->vertex_qnt; j++) {
             int similarity = calculate_similarity(people[i], people[j]);
