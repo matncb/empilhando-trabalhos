@@ -6,6 +6,14 @@
 #define MAX_LINE_LENGTH 256
 #define INITIAL_CAPACITY 100
 
+struct DataBank {
+    char **names;
+    int name_count;
+    char **songs;
+    char **artists;
+    int song_count;
+};
+
 char **read_names_from_csv(char *filename, int *count) {
     FILE *file = fopen(filename, "r");
     if (!file) {
@@ -263,5 +271,6 @@ void data_get_random_song_pair(DataBank *bank, char **song, char **artist) {
     *song = bank->songs[index];
     *artist = bank->artists[index];
 }
+
 
 

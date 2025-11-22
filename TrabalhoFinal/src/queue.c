@@ -4,6 +4,11 @@
 #include <queue.h>
 #include <music.h>
 
+struct Queue {
+    int bottom, top, elements;
+    Music *musics[QUEUE_SIZE];
+};
+
 Queue *queue_create()
 {
     Queue *queue = (Queue *) malloc(sizeof(Queue));

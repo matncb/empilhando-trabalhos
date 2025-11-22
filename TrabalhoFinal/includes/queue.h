@@ -2,15 +2,11 @@
 #define _QUEUE_H
 
 #include <music.h>
+#include <stdbool.h>
 
 #define QUEUE_SIZE 100
 
-typedef struct
-{
-    int bottom, top, elements; //bottom é o índice do primeiro elemento e top é o último mais 1 (proximo)
-    Music *musics[QUEUE_SIZE];
-} Queue;
-
+typedef struct Queue Queue;
 
 Queue *queue_create();
 
