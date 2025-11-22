@@ -303,7 +303,8 @@ O balanceamento funciona da seguinte forma:
 - Atualizada dinamicamente quando playlists são modificadas
 - Fornece visualização ordenada diferente da PopList
 
-**Observação importante**: Apesar de ser levemente diferente do que é feito no resto das aplicações, para um sistema integrado completo, é muito útil poder ordenar os resultados por tamanho de playlist. Esse passo constitui um primeiro degrau para a ampliação do projeto.
+**Observação importante**: Apesar de ser levemente diferente do que é feito no resto das aplicações, para um sistema integrado completo, é muito útil poder ordenar os resultados por tamanho de playlist. Esse passo constitui um primeiro degrau para uma ampliação do projeto.
+
 ---
 
 ### 3.4 TAD PlayList (Lista Duplamente Encadeada Ordenada)
@@ -695,8 +696,8 @@ void ui_add_music(...) {
 ### 5. Interação com o Usuário
 
 1. ✅ **list**: Lista todas as pessoas cadastradas
-2. ✅ **recommend <nome>**: Gera recomendações para uma pessoa
-3. ✅ **similar <nome>**: Mostra pessoas similares
+2. ✅ **recommend \<nome\>**: Gera recomendações para uma pessoa
+3. ✅ **similar \<nome\>**: Mostra pessoas similares
 4. ✅ **graph**: Visualiza matriz de adjacência
 5. ✅ **tree**: Visualiza árvore AVL ordenada
 6. ✅ **export**: Exporta grafo para arquivo CSV (graph.csv)
@@ -704,7 +705,7 @@ void ui_add_music(...) {
 8. ✅ **remove_person**: Remove pessoa
 9. ✅ **add_music**: Adiciona música à playlist
 10. ✅ **remove_music**: Remove música da playlist
-11. ✅ **playlist <nome>**: Mostra playlist de uma pessoa
+11. ✅ **playlist \<nome\>**: Mostra playlist de uma pessoa
 12. ✅ **help**: Mostra ajuda
 13. ✅ **off**: Encerra programa
 
