@@ -1,4 +1,4 @@
-# Relatório Técnico - Sistema de Recomendação Musical Baseado em Similaridade
+# Sistema de Recomendação Musical Baseado em Similaridade
 
 ## 1. Introdução e Objetivos
 
@@ -20,19 +20,16 @@ Este projeto implementa um **Sistema de Recomendação Musical** que utiliza uma
 O sistema foi desenvolvido com os seguintes objetivos:
 
 1. **Modelar uma rede social de recomendações musicais** usando grafos para representar relações de similaridade
-2. **Demonstrar o uso prático de múltiplos TADs** trabalhando em conjunto para resolver um problema real
-3. **Implementar algoritmos de recomendação** baseados em análise de similaridade
-4. **Fornecer uma interface interativa** que permite ao usuário explorar e manipular a rede
-5. **Validar decisões de implementação** através de justificativas técnicas para cada escolha estrutural
+2. **Implementar algoritmos de recomendação** baseados em análise de similaridade
+3. **Fornecer uma interface interativa** que permite ao usuário explorar e manipular a rede
+4. **Validar decisões de implementação** através de justificativas técnicas para cada escolha estrutural
 
 ### 1.3 Contexto Escolhido
 
 O contexto escolhido foi uma **rede social de recomendações musicais**, onde:
 - **Vértices do grafo**: Representam pessoas cadastradas no sistema
 - **Arestas do grafo**: Representam relações de similaridade entre pessoas, ponderadas pelo número de músicas compartilhadas
-- **Funcionalidades principais**: Busca de pessoas similares, geração de recomendações personalizadas, visualização da rede
-
-Este contexto foi escolhido por ser intuitivo, permitir demonstração clara dos conceitos de grafos e oferecer funcionalidades práticas e interessantes.
+- **Funcionalidades principais**: Busca de pessoas similares, geração de recomendações personalizadas, exportação da rede
 
 ---
 
@@ -88,25 +85,11 @@ A escolha pela **matriz de adjacência** foi fundamentada nas seguintes razões:
 - Para grafos densos, a matriz de adjacência é mais eficiente em termos de:
   - **Acesso direto**: O(1) para verificar/atualizar uma aresta
   - **Espaço**: O(V²) é aceitável quando E ≈ V² (muitas arestas)
-  - **Simplicidade**: Implementação mais simples e direta
 
 **2. Operações Frequentes**
 - O sistema precisa **consultar pesos de arestas constantemente** durante a geração de recomendações
 - A matriz permite acesso O(1) a qualquer aresta, enquanto lista de adjacência requer O(V) no pior caso
 - A operação `graph_get_edge_weight()` é chamada repetidamente no algoritmo de recomendação
-
-**3. Atualização Eficiente**
-- Quando uma pessoa adiciona/remove músicas, todas as similaridades precisam ser recalculadas
-- Com matriz, a atualização é O(V²) garantido, enquanto com lista pode variar
-- A simetria do grafo é facilmente mantida: `adjMatrix[i][j] = adjMatrix[j][i]`
-
-**4. Visualização e Exportação**
-- A exportação para CSV e visualização da matriz são mais simples com matriz de adjacência
-- A estrutura já está no formato necessário para visualização
-
-**Desvantagens aceitas:**
-- Espaço O(V²) mesmo para grafos esparsos (mas o grafo é esperado ser denso)
-- Inicialização O(V²) (mas é feita uma única vez)
 
 #### 3.1.3 Funcionalidades do Grafo
 
@@ -320,6 +303,7 @@ O balanceamento funciona da seguinte forma:
 - Atualizada dinamicamente quando playlists são modificadas
 - Fornece visualização ordenada diferente da PopList
 
+**Observação importante**: Apesar de ser levemente diferente do que é feito no resto das aplicações, para um sistema integrado completo, é muito útil poder ordenar os resultados por tamanho de playlist. Esse passo constitui um primeiro degrau para a ampliação do projeto.
 ---
 
 ### 3.4 TAD PlayList (Lista Duplamente Encadeada Ordenada)
@@ -422,12 +406,12 @@ typedef struct {
 
 3. **Tamanho Limitado**
    - Recomendações têm limite máximo (5 músicas)
-   - Array de tamanho fixo é adequado e simples
+   - Array de tamanho fixo é adequado
 
 **Por que não uma lista encadeada?**
 
 - Tamanho máximo conhecido (5 recomendações)
-- Array é mais simples e eficiente para tamanho fixo
+- Array é mais eficiente para tamanho fixo
 - Fila circular evita realocações
 
 #### 3.5.3 Funcionalidades Principais
@@ -475,7 +459,7 @@ Responsável por carregar dados de arquivos CSV:
 
 ---
 
-## 4. Algoritmos e Lógicas Complexas
+## 4. Algoritmos
 
 ### 4.1 Algoritmo de Cálculo de Similaridade
 
@@ -511,15 +495,11 @@ int calculate_similarity(Person *p1, Person *p2) {
 - **Tempo**: O(M₁ × M₂), onde M é o tamanho das playlists
 - **Espaço**: O(M₁ + M₂) para armazenar arrays temporários
 
-#### 4.1.3 Otimizações Possíveis
-
-Uma otimização possível seria usar uma estrutura de hash para reduzir a complexidade para O(M₁ + M₂), mas a implementação atual é mais simples e adequada para o contexto.
-
 ### 4.2 Algoritmo de Geração de Recomendações
 
 #### 4.2.1 Descrição Detalhada
 
-O algoritmo `ui_generate_recommendations` é uma das partes mais complexas do sistema. Ele gera recomendações musicais personalizadas para uma pessoa baseado nas playlists de pessoas similares.
+O algoritmo pertence à função `ui_generate_recommendations`. Ele gera recomendações musicais personalizadas para uma pessoa baseado nas playlists de pessoas similares.
 
 **Fase 1: Identificação de Candidatos**
 ```c
@@ -697,7 +677,6 @@ void ui_add_music(...) {
 **Por que recalcular todas as similaridades?**
 - Quando uma pessoa adiciona/remove músicas, suas similaridades com TODAS as outras pessoas podem mudar
 - A implementação atual recalcula tudo para garantir consistência total
-- Uma otimização futura seria recalcular apenas as arestas relacionadas à pessoa modificada (O(V) ao invés de O(V²))
 
 #### 4.3.5 Complexidade
 
@@ -708,61 +687,12 @@ void ui_add_music(...) {
 | Adicionar música | O(m + log n + V²×M²) | Inserção na playlist + atualização da árvore + atualização do grafo |
 | Redimensionar grafo | O(N²) | Onde N é o novo tamanho (crescimento exponencial reduz frequência) |
 
-**Nota sobre redimensionamento**: O crescimento exponencial garante que o número de redimensionamentos seja O(log n) para n adições, resultando em complexidade amortizada O(n²) para n adições, ao invés de O(n³) se redimensionasse de um em um.
+**Nota sobre redimensionamento**: O crescimento exponencial garante que o número de redimensionamentos seja O(log n) para n adições
 
 ---
 
-## 5. Verificação dos Requisitos do Projeto
 
-### 5.1 Requisitos Obrigatórios
-
-#### ✅ TAD Grafo (Obrigatório)
-- **Status**: Implementado e funcional
-- **Tipo**: Não-direcionado, ponderado
-- **Implementação**: Matriz de adjacência
-- **Funcionalidades**: Criação, atualização, consulta de arestas, exportação
-
-#### ✅ Pelo Menos 2 TADs Adicionais
-- **TAD PopList**: Lista duplamente encadeada ordenada
-- **TAD Tree (AVL)**: Árvore balanceada
-- **TAD PlayList**: Lista duplamente encadeada ordenada (estrutura similar, mas funcionalidade distinta)
-- **TAD Queue**: Fila circular
-
-**Total**: 4 TADs adicionais ao grafo, excedendo o requisito mínimo de 2.
-
-#### ✅ Vértices com Variação de Representação
-- **Status**: Parcialmente atendido
-- **Observação**: Todos os vértices representam pessoas. O requisito sugeria vértices de tipos diferentes (ex: pessoas e grupos). No entanto, a variação é implementada através de:
-  - Diferentes tamanhos de playlist (organizados na árvore AVL)
-  - Diferentes níveis de similaridade (representados pelos pesos das arestas)
-  
-**Justificativa**: O contexto de rede musical não requer tipos diferentes de vértices. A variação está na organização e relacionamento entre pessoas, não na natureza dos vértices.
-
-#### ✅ Funcionalidades Práticas no Grafo
-- **Busca de pessoas similares**: Implementada em `ui_show_similar`
-- **Geração de recomendações**: Implementada em `ui_generate_recommendations`
-- **Visualização da rede**: Implementada em `ui_show_graph` e `export_graph`
-
-### 5.2 Requisitos de Implementação
-
-#### ✅ Linguagem C
-- Todo o código está em C puro
-
-#### ✅ Bibliotecas Permitidas
-- Apenas `string.h` e `math.h` são utilizadas (além de bibliotecas padrão)
-
-#### ✅ Organização do Código
-- TADs separados em arquivos próprios
-- Headers em `includes/`
-- Implementações em `src/`
-- Makefile fornecido
-
-#### ✅ Interface Interativa
-- Menu de comandos implementado
-- Comandos via terminal
-- Tratamento de entrada do usuário
-
-### 5.3 Funcionalidades Implementadas
+### 5. Interação com o Usuário
 
 1. ✅ **list**: Lista todas as pessoas cadastradas
 2. ✅ **recommend <nome>**: Gera recomendações para uma pessoa
@@ -780,89 +710,9 @@ void ui_add_music(...) {
 
 ---
 
-## 6. Decisões de Design e Justificativas
+## 6. Resumo da Complexidade Geral do Sistema
 
-### 6.1 Estrutura de Dados para PopList
-
-**Decisão**: Lista duplamente encadeada ordenada alfabeticamente
-
-**Justificativa**:
-- Permite inserção ordenada eficiente
-- Facilita busca e visualização
-- Remoção O(1) após encontrar elemento
-- Crescimento dinâmico sem realocação
-
-**Alternativas consideradas**:
-- Array: Requer realocação e deslocamento de elementos
-- Árvore: Mais complexa, ordem alfabética já atendida pela lista
-
-### 6.2 Estrutura de Dados para Árvore AVL
-
-**Decisão**: Árvore AVL ordenada por tamanho de playlist
-
-**Justificativa**:
-- Busca O(log n) por tamanho
-- Organização alternativa útil (diferente da PopList)
-- Balanceamento automático garante eficiência
-- Permite range queries futuras
-
-**Alternativas consideradas**:
-- BST simples: Pode degenerar em lista
-- Heap: Não permite busca por valor específico facilmente
-
-### 6.3 Algoritmo de Recomendação
-
-**Decisão**: Seleção ponderada dos top 30% mais similares
-
-**Justificativa**:
-- Foca em pessoas realmente similares
-- Seleção ponderada dá mais peso a pessoas mais similares
-- Evita recomendações aleatórias de pessoas pouco relacionadas
-- Limite de 5 recomendações evita sobrecarga
-
-**Alternativas consideradas**:
-- Recomendar de todas as pessoas: Pode incluir recomendações irrelevantes
-- Apenas a mais similar: Limita diversidade das recomendações
-
-### 6.4 Estratégia de Atualização
-
-**Decisão**: Recalcular todas as similaridades quando uma playlist muda
-
-**Justificativa**:
-- Garante consistência total
-- Implementação simples e correta
-- Para 100 pessoas, o custo é aceitável
-
-**Otimização futura possível**:
-- Recalcular apenas arestas relacionadas à pessoa modificada
-- Reduziria complexidade de O(V²) para O(V)
-
-### 6.5 Estratégia de Redimensionamento do Grafo
-
-**Decisão**: Crescimento exponencial (dobrar o tamanho quando necessário)
-
-**Justificativa**:
-- **Eficiência**: Evita realocações frequentes quando múltiplas pessoas são adicionadas
-- **Complexidade amortizada**: O(n²) para n adições, ao invés de O(n³) se redimensionasse de um em um
-- **Prática comum**: Estratégia amplamente utilizada em estruturas dinâmicas (ex: `std::vector` em C++)
-- **Balanceamento**: Reduz frequência de realocações sem desperdiçar muito espaço
-
-**Como funciona**:
-- Se o grafo tem tamanho S e precisa de tamanho N > S
-- Calcula novo tamanho: dobra S até que seja ≥ N
-- Exemplo: S=100, N=101 → novo tamanho = 200
-- Próximas adições até 200 não requerem redimensionamento
-
-**Alternativas consideradas**:
-- Crescimento linear (adicionar 10 por vez): Ainda requer muitas realocações
-- Crescimento exato (exatamente o necessário): Muito ineficiente, realoca a cada adição
-- Crescimento exponencial: Melhor balanceamento entre eficiência e uso de memória
-
----
-
-## 7. Complexidade Geral do Sistema
-
-### 7.1 Operações Principais
+### 6.1 Operações Principais
 
 | Operação | Complexidade | Justificativa |
 |----------|--------------|---------------|
@@ -883,7 +733,7 @@ Onde:
 - C = número de candidatos similares
 - R = número de recomendações geradas
 
-### 7.2 Espaço
+### 6.2 Espaço
 
 - **Grafo**: O(V²) - matriz de adjacência
 - **PopList**: O(n) - lista encadeada
@@ -891,66 +741,54 @@ Onde:
 - **PlayLists**: O(n × m) - uma playlist por pessoa
 - **Total**: O(V² + n × m)
 
----
-
-## 8. Conclusão
+## 7. Conclusão, Resumo e Observações Técnicas
 
 Este projeto demonstra a aplicação prática de múltiplos TADs trabalhando em conjunto para resolver um problema real de recomendação musical. As decisões de implementação foram fundamentadas em:
 
 1. **Eficiência**: Escolha de estruturas adequadas para cada operação
-2. **Simplicidade**: Implementações diretas e compreensíveis
-3. **Funcionalidade**: Sistema completo e interativo
-4. **Consistência**: Sincronização entre todas as estruturas
+2. **Funcionalidade**: Sistema completo e interativo
+3. **Consistência**: Sincronização entre todas as estruturas
 
-O sistema atende todos os requisitos obrigatórios e oferece funcionalidades adicionais que demonstram o domínio dos conceitos de estruturas de dados. A escolha pela matriz de adjacência para o grafo é justificada pelo contexto de grafo denso e necessidade de acesso rápido às arestas, enquanto os outros TADs complementam o sistema oferecendo diferentes formas de organização e acesso aos dados.
-
----
-
-## 9. Referências e Notas Técnicas
-
-### 9.1 Estruturas de Dados Utilizadas
+### 7.1 Estruturas de Dados Utilizadas
 
 - **Grafo**: Representação por matriz de adjacência
 - **Lista Duplamente Encadeada**: PopList e PlayList
 - **Árvore AVL**: Tree para organização por tamanho
 - **Fila Circular**: Queue para recomendações temporárias
 
-### 9.2 Algoritmos Implementados
+### 7.2 Algoritmos Implementados
 
 - Cálculo de similaridade (comparação de playlists)
 - Geração de recomendações (seleção ponderada)
 - Balanceamento AVL (rotações simples e duplas)
 - Atualização dinâmica de estruturas
 
-### 9.3 Tratamento de Erros e Segurança
+### 7.3 Tratamento de Erros e Segurança
 
-#### 9.3.1 Validações Implementadas
+#### 7.3.1 Validações Implementadas
 
 - **Verificação de ponteiros nulos**: Todas as funções verificam ponteiros antes de uso
 - **Validação de parâmetros**: Entradas são validadas antes de processamento
 - **Tratamento de memória insuficiente**: Verificações de `malloc` e `realloc`
 - **Mensagens de erro informativas**: Usuário recebe feedback claro sobre erros
 
-#### 9.3.2 Proteções contra Buffer Overflow
+#### 7.3.2 Proteções contra Buffer Overflow
 
 - **`string_split`**: Usa `strncpy` com limite para evitar overflow
 - **Validação de tamanho de strings**: Strings são truncadas se excederem `MAX_CMD_LENGTH`
 - **Verificação de limites de arrays**: Arrays fixos têm verificações de limites
 
-#### 9.3.3 Proteções de Memória
+#### 7.3.3 Proteções de Memória
 
 - **Verificação de `strdup` com NULL**: Evita comportamento indefinido
 - **Validação antes de acesso a listas**: Verifica se `start` é NULL antes de percorrer
 - **Limites em loops**: Loops têm verificações para evitar acesso fora dos limites
 - **Divisão por zero**: Verificações antes de operações que podem causar divisão por zero
 
-#### 9.3.4 Redimensionamento Seguro
+#### 7.3.4 Redimensionamento Seguro
 
 - **Verificação de overflow**: Crescimento exponencial verifica overflow de multiplicação
 - **Liberação de memória**: Em caso de falha, toda memória alocada é liberada
 - **Preservação de dados**: Durante redimensionamento, dados existentes são preservados
 
----
-
-**Fim do Relatório**
 
