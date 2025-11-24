@@ -17,6 +17,12 @@ Queue *queue_create()
     queue->top = 0;
     queue->bottom = 0;
     queue->elements = 0;
+    
+    // Inicializa musicas como NULL para prevenir free de ponteiros invalidos
+    for (int i = 0; i < QUEUE_SIZE; i++)
+    {
+        queue->musics[i] = NULL;
+    }
 
     return queue;
 }
@@ -109,7 +115,10 @@ void queue_free(Queue *queue)
     Music *music;
     while (!queue_is_empty(queue)) {
         if (queue_remove(queue, &music) == 0) {
-            music_free(music);
+            // Valida o ponteiro antes de dar free
+            if (music != NULL) {
+                music_free(music);
+            }
         }
     }
     

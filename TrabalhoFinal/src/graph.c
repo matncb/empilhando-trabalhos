@@ -231,10 +231,16 @@ int graph_resize(Graph *graph, int new_size)
     int old_size = graph->vertex_qnt;
     int calculated_size = old_size;
     
+    // Trata caso no qual old_size é 0
+    if (calculated_size == 0)
+        calculated_size = 1;
+    
     while (calculated_size < new_size)
     {
+        int prev_size = calculated_size;
         calculated_size = calculated_size * 2;
-        if (calculated_size < old_size)
+        // Checa para overflow ou se nao não foi feito progress
+        if (calculated_size < prev_size || calculated_size < old_size)
         {
             calculated_size = new_size;
             break;

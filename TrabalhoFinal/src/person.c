@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <person.h>
 #include <string.h>
+#include <strings.h>
 #include <stdlib.h>
 #include <playlist.h>
 
@@ -145,11 +146,11 @@ int person_compare_order(Person *person1, Person *person2)
     if ((person1->name == NULL) || (person2->name == NULL))
         return NULL_NAMES_ERROR;
 
-    if (strcmp(person1->name, person2->name) < 0)
+    if (strcasecmp(person1->name, person2->name) < 0)
     {
         return PERSON1_BEFORE; // person1 vem antes
     }
-    else if (strcmp(person1->name, person2->name) > 0)
+    else if (strcasecmp(person1->name, person2->name) > 0)
     {
         return PERSON2_BEFORE; // person1 vem depois
     }
@@ -166,11 +167,11 @@ int person_compare_order_by_name(Person *person1, char *name)
     if ((person1->name == NULL) || name == NULL)
         return NULL_NAMES_ERROR;
 
-    if (strcmp(person1->name, name) < 0)
+    if (strcasecmp(person1->name, name) < 0)
     {
         return PERSON1_BEFORE; // person1 vem antes
     }
-    else if (strcmp(person1->name, name) > 0)
+    else if (strcasecmp(person1->name, name) > 0)
     {
         return PERSON2_BEFORE; // person1 vem depois
     }

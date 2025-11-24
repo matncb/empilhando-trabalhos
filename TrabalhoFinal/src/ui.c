@@ -51,6 +51,108 @@ char **string_split(char *string, char *delimiter, int *count)
     return strings;
 }
 
+char **string_split_quoted(char *string, int *count)
+{
+    int cmd_qnt = 0;
+    char **strings = malloc(sizeof(char *) * MAX_CMD);
+    if (!strings)
+        return NULL;
+
+    int len = strlen(string);
+    int i = 0;
+    int in_quotes = 0;
+    char quote_char = 0;
+    int token_start = -1;
+
+    while (i < len && cmd_qnt < MAX_CMD)
+    {
+        while (i < len && (string[i] == ' ' || string[i] == '\t'))
+            i++;
+
+        if (i >= len)
+            break;
+
+        // Verifica se estamos iniciando uma string entre aspas
+        if (string[i] == '"' || string[i] == '\'')
+        {
+            quote_char = string[i];
+            in_quotes = 1;
+            token_start = i + 1; // Inicia apos a aspas
+            i++;
+        }
+        else
+        {
+            quote_char = 0;
+            in_quotes = 0;
+            token_start = i;
+        }
+
+        // Encontra o fim do token
+        int token_end = token_start;
+        while (i < len)
+        {
+            if (in_quotes)
+            {
+                if (string[i] == quote_char)
+                {
+                    // Busca a aspas de fechamento
+                    token_end = i;
+                    i++; // Pula a aspas de fechamento
+                    break;
+                }
+            }
+            else
+            {
+                if (string[i] == ' ' || string[i] == '\t' || string[i] == '\n' || string[i] == '\r')
+                {
+                    token_end = i;
+                    break;
+                }
+            }
+            i++;
+        }
+        
+        // Se chegamos ao fim da string, inclui o resto como token
+        if (i >= len && token_end == token_start)
+        {
+            token_end = len;
+        }
+
+        if (token_end > token_start)
+        {
+            int token_len = token_end - token_start;
+            if (token_len >= MAX_CMD_LENGTH)
+                token_len = MAX_CMD_LENGTH - 1;
+
+            strings[cmd_qnt] = malloc(sizeof(char) * MAX_CMD_LENGTH);
+            if (!strings[cmd_qnt])
+            {
+                for (int j = 0; j < cmd_qnt; j++)
+                {
+                    free(strings[j]);
+                }
+                free(strings);
+                return NULL;
+            }
+
+            strncpy(strings[cmd_qnt], string + token_start, token_len);
+            strings[cmd_qnt][token_len] = '\0';
+            cmd_qnt++;
+        }
+
+        // Pula os espacos em branco no final
+        while (i < len && (string[i] == ' ' || string[i] == '\t' || string[i] == '\n' || string[i] == '\r'))
+            i++;
+        
+        // Se chegamos ao fim, sair do loop
+        if (i >= len)
+            break;
+    }
+
+    *count = cmd_qnt;
+    return strings;
+}
+
 void ui_list_people(PopList *poplist)
 {
     if (!poplist)
@@ -126,6 +228,14 @@ Queue *ui_generate_recommendations(Graph *graph, PopList *poplist, int person_id
         return NULL;
     }
 
+    // Verifica se a pessoa nesse indice é valida
+    if (!people[person_idx])
+    {
+        free(people);
+        queue_free(queue);
+        return NULL;
+    }
+
     PlayList *person_pl = (PlayList *)person_get_playlist(people[person_idx]);
     Music **person_songs = NULL;
     int person_pl_size = 0;
@@ -161,7 +271,7 @@ Queue *ui_generate_recommendations(Graph *graph, PopList *poplist, int person_id
             free(person_songs);
         free(people);
         queue_free(queue);
-        return queue;
+        return NULL;
     }
 
     for (int i = 0; i < candidates_count - 1; i++)
@@ -199,16 +309,49 @@ Queue *ui_generate_recommendations(Graph *graph, PopList *poplist, int person_id
             free(person_songs);
         free(people);
         queue_free(queue);
-        return queue;
+        return NULL;
+    }
+
+    // Verifica se algum candidato tem musicas em sua playlist
+    bool has_any_musics = false;
+    for (int i = 0; i < top_count; i++)
+    {
+        if (candidates[i] < 0 || candidates[i] >= n)
+            continue;
+        if (!people[candidates[i]])
+            continue;
+        PlayList *pl = (PlayList *)person_get_playlist(people[candidates[i]]);
+        if (pl && playlist_get_elements(pl) > 0)
+        {
+            has_any_musics = true;
+            break;
+        }
+    }
+
+    if (!has_any_musics)
+    {
+        if (person_songs)
+            free(person_songs);
+        free(people);
+        queue_free(queue);
+        return NULL;
     }
 
     int max_recommendations = 5;
     int attempts = 0;
-    int max_attempts = top_count * 10;
+    int max_attempts = top_count * 50;
+    if (max_attempts > 500)
+        max_attempts = 500; 
+    int consecutive_failures = 0;
+    int max_consecutive_failures = 100; 
 
     while (queue_get_elements(queue) < max_recommendations && attempts < max_attempts)
     {
         attempts++;
+
+        // Verifica se o total de peso é valido
+        if (total_weight <= 0)
+            break;
 
         int random_val = rand() % total_weight;
         int selected_idx = -1;
@@ -224,26 +367,62 @@ Queue *ui_generate_recommendations(Graph *graph, PopList *poplist, int person_id
             }
         }
 
-        if (selected_idx < 0)
+        if (selected_idx < 0 || selected_idx >= n)
+        {
+            consecutive_failures++;
+            if (consecutive_failures >= max_consecutive_failures)
+                break;
             continue;
+        }
+
+        if (!people[selected_idx])
+        {
+            consecutive_failures++;
+            if (consecutive_failures >= max_consecutive_failures)
+                break;
+            continue;
+        }
 
         PlayList *pl = (PlayList *)person_get_playlist(people[selected_idx]);
         if (!pl)
+        {
+            consecutive_failures++;
+            if (consecutive_failures >= max_consecutive_failures)
+                break;
             continue;
+        }
 
         Music **songs = playlist_songs(pl);
         if (!songs)
+        {
+            consecutive_failures++;
+            if (consecutive_failures >= max_consecutive_failures)
+                break;
             continue;
+        }
 
         int size = playlist_get_elements(pl);
         if (size == 0)
         {
             free(songs);
+            consecutive_failures++;
+            if (consecutive_failures >= max_consecutive_failures)
+                break;
             continue;
         }
 
         int song_idx = rand() % size;
         Music *candidate = songs[song_idx];
+        
+        
+        if (!candidate)
+        {
+            free(songs);
+            consecutive_failures++;
+            if (consecutive_failures >= max_consecutive_failures)
+                break;
+            continue;
+        }
 
         bool is_duplicate = false;
 
@@ -276,14 +455,46 @@ Queue *ui_generate_recommendations(Graph *graph, PopList *poplist, int person_id
 
         if (!is_duplicate)
         {
+            // Obtem o nome e o artista, verifica se sao validos
+            char *candidate_name = music_get_name(candidate);
+            char *candidate_artist = music_get_artist(candidate);
+            
+            if (!candidate_name || !candidate_artist)
+            {
+                free(songs);
+                consecutive_failures++;
+                if (consecutive_failures >= max_consecutive_failures)
+                    break;
+                continue;
+            }
+            
             Music *rec = music_create(
-                music_get_name(candidate),
-                music_get_artist(candidate),
+                candidate_name,
+                candidate_artist,
                 "Recomendacao baseada em similaridade");
 
             if (rec)
             {
                 queue_add(queue, rec);
+                consecutive_failures = 0;
+            }
+            else
+            {
+                consecutive_failures++;
+                if (consecutive_failures >= max_consecutive_failures)
+                {
+                    free(songs);
+                    break;
+                }
+            }
+        }
+        else
+        {
+            consecutive_failures++;
+            if (consecutive_failures >= max_consecutive_failures)
+            {
+                free(songs);
+                break;
             }
         }
 
@@ -737,17 +948,27 @@ void ui_run(Graph *graph, PopList *poplist, Tree *tree)
 
         fgets(command, FULL_CMD_LENGTH, stdin);
 
-        char **strings = string_split(command, " ", &command_qnt);
+        char **strings = string_split_quoted(command, &command_qnt);
         if (!strings)
         {
             printf("Sem memoria disponivel\n");
             return;
         }
 
+    
+        if (strings[0])
+            strings[0][strcspn(strings[0], END_LINE)] = '\0';
+
+        // Trata comando vazio
+        if (command_qnt == 0)
+        {
+            free_split_strings(strings, command_qnt);
+            continue;
+        }
+
+
         if (command_qnt == 1)
         {
-            if (strings[0])
-                strings[0][strcspn(strings[0], END_LINE)] = '\0';
             if (!strcmp(strings[0], "list"))
             {
                 ui_list_people(poplist);
@@ -842,4 +1063,3 @@ void ui_run(Graph *graph, PopList *poplist, Tree *tree)
         printf("\n");
     }
 }
-
