@@ -122,8 +122,11 @@ int read_songs_from_csv(char *filename, char ***songs, char ***artists, int *cou
             char **new_songs = (char **)realloc(song_list, capacity * sizeof(char *));
             char **new_artists = (char **)realloc(artist_list, capacity * sizeof(char *));
             if (!new_songs || !new_artists) {
-                if (new_songs) free(new_songs);
-                if (new_artists) free(new_artists);
+                // Se realloc falhou, libera os novos ponteiros se existirem
+                // e os antigos ainda são válidos
+                if (new_songs && new_songs != song_list) free(new_songs);
+                if (new_artists && new_artists != artist_list) free(new_artists);
+                // Libera memória já alocada
                 for (int i = 0; i < size; i++) {
                     free(song_list[i]);
                     free(artist_list[i]);
@@ -133,6 +136,9 @@ int read_songs_from_csv(char *filename, char ***songs, char ***artists, int *cou
                 fclose(file);
                 return 1;
             }
+            // Atualiza os ponteiros para os novos blocos de memória
+            song_list = new_songs;
+            artist_list = new_artists;
             song_list = new_songs;
             artist_list = new_artists;
         }

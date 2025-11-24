@@ -38,6 +38,13 @@ void person_free(Person *person)
     if (person == NULL)
         return;
 
+    // Libera a playlist se existir
+    if (person->playlist != NULL)
+    {
+        playlist_free(person->playlist);
+        person->playlist = NULL;
+    }
+
     free(person->name);
     free(person->tel);
     free(person->email);
