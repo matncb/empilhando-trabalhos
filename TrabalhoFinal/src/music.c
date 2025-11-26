@@ -122,6 +122,7 @@ int music_compare_order(Music *music1, Music *music2)
     return MUSIC_EQUAL; // music1 é igual
 }
 
+
 int music_compare_order_by_name(Music *music1, char *name)
 {
     // Código de erro para argumentos incorretos

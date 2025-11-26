@@ -20,5 +20,4 @@ char *music_get_artist(Music *music);
 char *music_get_comment(Music *music);
 int music_compare_order(Music *music1, Music *music2);
 int music_compare_order_by_name(Music *music1, char *name);
-
 #endif 

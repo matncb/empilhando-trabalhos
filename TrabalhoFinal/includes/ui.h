@@ -6,7 +6,7 @@
 #include <tree.h>
 #include <queue.h>
 
-#define MAX_CMD_LENGTH 20
+#define MAX_CMD_LENGTH 200
 #define MAX_CMD 5
 #define FULL_CMD_LENGTH MAX_CMD_LENGTH*MAX_CMD+MAX_CMD
 

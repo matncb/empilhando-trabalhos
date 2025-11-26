@@ -187,7 +187,6 @@ int playlist_add(PlayList *playlist, Music *music)
     while ((compare == MUSIC1_BEFORE) && aux != NULL)
     {
         compare = music_compare_order(aux->music, music);
-
         if (compare == MUSIC_EQUAL)
         {
             // já existe uma música com esse nome
