@@ -72,12 +72,11 @@ char **string_split_quoted(char *string, int *count)
         if (i >= len)
             break;
 
-        // Verifica se estamos iniciando uma string entre aspas
         if (string[i] == '"' || string[i] == '\'')
         {
             quote_char = string[i];
             in_quotes = 1;
-            token_start = i + 1; // Inicia apos a aspas
+            token_start = i + 1;
             i++;
         }
         else
@@ -87,7 +86,6 @@ char **string_split_quoted(char *string, int *count)
             token_start = i;
         }
 
-        // Encontra o fim do token
         int token_end = token_start;
         while (i < len)
         {
@@ -95,9 +93,8 @@ char **string_split_quoted(char *string, int *count)
             {
                 if (string[i] == quote_char)
                 {
-                    // Busca a aspas de fechamento
                     token_end = i;
-                    i++; // Pula a aspas de fechamento
+                    i++; 
                     break;
                 }
             }
@@ -112,7 +109,6 @@ char **string_split_quoted(char *string, int *count)
             i++;
         }
         
-        // Se chegamos ao fim da string, inclui o resto como token
         if (i >= len && token_end == token_start)
         {
             token_end = len;
@@ -140,11 +136,9 @@ char **string_split_quoted(char *string, int *count)
             cmd_qnt++;
         }
 
-        // Pula os espacos em branco no final
         while (i < len && (string[i] == ' ' || string[i] == '\t' || string[i] == '\n' || string[i] == '\r'))
             i++;
         
-        // Se chegamos ao fim, sair do loop
         if (i >= len)
             break;
     }
@@ -172,7 +166,6 @@ void ui_list_people(PopList *poplist)
     printf("Pessoas cadastradas (%d):\n", n);
     for (int i = 0; i < n; i++)
     {
-        // Valida se a pessoa é válida antes de acessar
         if (!people[i])
         {
             printf("  [%d] (pessoa invalida)\n", i + 1);
@@ -206,7 +199,6 @@ int ui_find_person_index(PopList *poplist, char *name)
     int n = poplist_get_elements(poplist);
     for (int i = 0; i < n; i++)
     {
-        // Valida se a pessoa é válida antes de acessar
         if (!people[i])
             continue;
             
@@ -250,7 +242,6 @@ Queue *ui_generate_recommendations(Graph *graph, PopList *poplist, int person_id
         return NULL;
     }
 
-    // Verifica se a pessoa nesse indice é valida
     if (!people[person_idx])
     {
         free(people);
@@ -334,7 +325,6 @@ Queue *ui_generate_recommendations(Graph *graph, PopList *poplist, int person_id
         return NULL;
     }
 
-    // Verifica se algum candidato tem musicas em sua playlist
     bool has_any_musics = false;
     for (int i = 0; i < top_count; i++)
     {
@@ -371,7 +361,6 @@ Queue *ui_generate_recommendations(Graph *graph, PopList *poplist, int person_id
     {
         attempts++;
 
-        // Verifica se o total de peso é valido
         if (total_weight <= 0)
             break;
 
@@ -477,7 +466,6 @@ Queue *ui_generate_recommendations(Graph *graph, PopList *poplist, int person_id
 
         if (!is_duplicate)
         {
-            // Obtem o nome e o artista, verifica se sao validos
             char *candidate_name = music_get_name(candidate);
             char *candidate_artist = music_get_artist(candidate);
             
@@ -537,7 +525,6 @@ void ui_show_recommendations(Graph *graph, PopList *poplist, char *person_name)
         return;
     }
     
-    // Valida se a string não está vazia
     if (strlen(person_name) == 0)
     {
         printf("Parametros invalidos: nome da pessoa nao pode estar vazio.\n");
@@ -555,7 +542,6 @@ void ui_show_recommendations(Graph *graph, PopList *poplist, char *person_name)
     if (!people)
         return;
 
-    // Valida se a pessoa é válida antes de acessar
     if (!people[idx])
     {
         printf("Pessoa invalida.\n");
@@ -590,7 +576,6 @@ void ui_show_recommendations(Graph *graph, PopList *poplist, char *person_name)
         int size = queue_get_elements(recommendations);
         for (int i = 0; i < size; i++)
         {
-            // Valida se a música é válida antes de acessar
             if (!musics[i])
             {
                 printf("  [%d] (musica invalida)\n", i + 1);
@@ -635,7 +620,6 @@ void ui_show_graph(Graph *graph, PopList *poplist)
     printf("      ");
     for (int j = 0; j < max_show; j++)
     {
-        // Valida antes de acessar
         if (people[j] && person_get_name(people[j]))
             printf("%6.6s ", person_get_name(people[j]));
         else
@@ -645,7 +629,6 @@ void ui_show_graph(Graph *graph, PopList *poplist)
 
     for (int i = 0; i < max_show; i++)
     {
-        // Valida antes de acessar
         if (people[i] && person_get_name(people[i]))
             printf("%6.6s ", person_get_name(people[i]));
         else
@@ -671,7 +654,6 @@ void ui_show_similar(Graph *graph, PopList *poplist, char *person_name)
         return;
     }
     
-    // Valida se a string não está vazia
     if (strlen(person_name) == 0)
     {
         printf("Parametros invalidos: nome da pessoa nao pode estar vazio.\n");
@@ -699,7 +681,6 @@ void ui_show_similar(Graph *graph, PopList *poplist, char *person_name)
     {
         if (i != idx)
         {
-            // Valida se a pessoa é válida antes de acessar
             if (!people[i])
                 continue;
                 
@@ -753,7 +734,6 @@ void ui_show_tree(Tree *tree)
 
     for (int i = 0; i < n; i++)
     {
-        // Valida se a pessoa é válida antes de acessar
         if (!people[i])
         {
             printf("  [%d] (pessoa invalida)\n", i + 1);
@@ -784,7 +764,6 @@ void ui_add_person(Graph *graph, PopList *poplist, Tree *tree, char *name, char 
         return;
     }
     
-    // Valida se as strings não estão vazias
     if (strlen(name) == 0 || strlen(tel) == 0 || strlen(email) == 0)
     {
         printf("Parametros invalidos: nome, telefone e email nao podem estar vazios.\n");
@@ -842,7 +821,6 @@ void ui_remove_person(Graph *graph, PopList *poplist, Tree *tree, char *name)
         return;
     }
     
-    // Valida se a string não está vazia
     if (strlen(name) == 0)
     {
         printf("Parametros invalidos: nome nao pode estar vazio.\n");
@@ -880,7 +858,6 @@ void ui_add_music(Graph *graph, PopList *poplist, Tree *tree, char *person_name,
         return;
     }
     
-    // Valida se as strings não estão vazias
     if (strlen(person_name) == 0 || strlen(music_name) == 0 || strlen(artist) == 0)
     {
         printf("Parametros invalidos: nome da pessoa, nome da musica e artista nao podem estar vazios.\n");
@@ -935,18 +912,17 @@ void ui_add_music(Graph *graph, PopList *poplist, Tree *tree, char *person_name,
     return;
 }
 
-void ui_remove_music(Graph *graph, PopList *poplist, Tree *tree, char *person_name, char *music_name)
+void ui_remove_music(Graph *graph, PopList *poplist, Tree *tree, char *person_name, char *music_name, char *artist)
 {
-    if (!graph || !poplist || !tree || !person_name || !music_name)
+    if (!graph || !poplist || !tree || !person_name || !music_name || !artist)
     {
         printf("Parametros invalidos.\n");
         return;
     }
     
-    // Valida se as strings não estão vazias
-    if (strlen(person_name) == 0 || strlen(music_name) == 0)
+    if (strlen(person_name) == 0 || strlen(music_name) == 0 || strlen(artist) == 0)
     {
-        printf("Parametros invalidos: nome da pessoa e nome da musica nao podem estar vazios.\n");
+        printf("Parametros invalidos: nome da pessoa, nome da musica e artista nao podem estar vazios.\n");
         return;
     }
 
@@ -966,7 +942,7 @@ void ui_remove_music(Graph *graph, PopList *poplist, Tree *tree, char *person_na
 
     int old_size = playlist_get_elements(playlist);
 
-    int result = playlist_remove_by_name(playlist, music_name);
+    int result = playlist_remove_by_name_and_artist(playlist, music_name, artist);
     if (result == 0)
     {
         int new_size = playlist_get_elements(playlist);
@@ -993,7 +969,6 @@ void ui_show_playlist(PopList *poplist, char *person_name)
         return;
     }
     
-    // Valida se a string não está vazia
     if (strlen(person_name) == 0)
     {
         printf("Parametros invalidos: nome da pessoa nao pode estar vazio.\n");
@@ -1026,7 +1001,6 @@ void ui_show_playlist(PopList *poplist, char *person_name)
 
     for (int i = 0; i < size; i++)
     {
-        // Valida se a música é válida antes de acessar
         if (!songs[i])
         {
             printf("  [%d] (musica invalida)\n", i + 1);
@@ -1081,7 +1055,7 @@ void ui_show_help()
     printf("  add_person <nome> <telefone> <email> - Adiciona nova pessoa\n");
     printf("  remove_person <nome> - Remove uma pessoa\n");
     printf("  add_music <nome_pessoa> <nome_musica> <artista> - Adiciona musica a playlist\n");
-    printf("  remove_music <nome_pessoa> <nome_musica> - Remove musica da playlist\n");
+    printf("  remove_music <nome_pessoa> <nome_musica> <artista> - Remove musica da playlist\n");
     printf("  playlist <nome> - Mostra musicas da playlist de uma pessoa\n");
     printf("  help - Mostra esta lista de comandos\n");
     printf("  off - Encerra o programa\n");
@@ -1109,7 +1083,6 @@ void ui_run(Graph *graph, PopList *poplist, Tree *tree)
         if (strings[0])
             strings[0][strcspn(strings[0], END_LINE)] = '\0';
 
-        // Trata comando vazio
         if (command_qnt == 0)
         {
             free_split_strings(strings, command_qnt);
@@ -1178,14 +1151,7 @@ void ui_run(Graph *graph, PopList *poplist, Tree *tree)
         {
             if (strings[2])
                 strings[2][strcspn(strings[2], END_LINE)] = '\0';
-            if (!strcmp(strings[0], "remove_music"))
-            {
-                ui_remove_music(graph, poplist, tree, strings[1], strings[2]);
-            }
-            else
-            {
-                printf("Comando nao existente\n");
-            }
+            printf("Comando nao existente\n");
         }
         else if (command_qnt == 4)
         {
@@ -1198,6 +1164,10 @@ void ui_run(Graph *graph, PopList *poplist, Tree *tree)
             else if (!strcmp(strings[0], "add_music"))
             {
                 ui_add_music(graph, poplist, tree, strings[1], strings[2], strings[3]);
+            }
+            else if (!strcmp(strings[0], "remove_music"))
+            {
+                ui_remove_music(graph, poplist, tree, strings[1], strings[2], strings[3]);
             }
             else
             {

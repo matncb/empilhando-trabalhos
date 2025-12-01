@@ -117,11 +117,9 @@ int playlist_remove_by_name(PlayList *playlist, char *name)
 
     Element *aux = playlist->start;
 
-    int compare = MUSIC1_BEFORE;
-
-    while ((compare == MUSIC1_BEFORE) && (aux != NULL))
+    while (aux != NULL)
     {
-        compare = music_compare_order_by_name(aux->music, name);
+        int compare = music_compare_order_by_name(aux->music, name);
 
         if (compare == MUSIC_EQUAL)
         {
@@ -147,6 +145,63 @@ int playlist_remove_by_name(PlayList *playlist, char *name)
             playlist->elements--;
             return 0;
         }
+        else if (compare == MUSIC2_BEFORE)
+        {
+            break;
+        }
+        
+        aux = aux->next;
+    }
+    return 1;
+}
+
+int playlist_remove_by_name_and_artist(PlayList *playlist, char *name, char *artist)
+{
+    if (playlist == NULL || name == NULL || artist == NULL)
+        return 1;
+    if (playlist->elements == 0)
+        return 1;
+
+    Element *aux = playlist->start;
+
+    while (aux != NULL)
+    {
+        int compare = music_compare_order_by_name(aux->music, name);
+
+        if (compare == MUSIC_EQUAL)
+        {
+            char *existing_artist = music_get_artist(aux->music);
+            
+            if (existing_artist != NULL && strcmp(existing_artist, artist) == 0)
+            {
+                if (aux->prev)
+                {
+                    (aux->prev)->next = aux->next;
+                }
+                else
+                {
+                    playlist->start = aux->next;
+                }
+
+                if (aux->next)
+                {
+                    (aux->next)->prev = aux->prev;
+                }
+                else
+                {
+                    playlist->end = aux->prev;
+                }
+
+                playlist_element_free(aux);
+                playlist->elements--;
+                return 0;
+            }
+        }
+        else if (compare == MUSIC2_BEFORE)
+        {
+            break;
+        }
+        
         aux = aux->next;
     }
     return 1;
@@ -182,27 +237,41 @@ int playlist_add(PlayList *playlist, Music *music)
     if (playlist == NULL) return 1;
 
     Element *aux = playlist->start;
-    int compare = MUSIC1_BEFORE;
+    Element *insert_position = NULL;
+    char *new_artist = music_get_artist(music);
 
-    while ((compare == MUSIC1_BEFORE) && aux != NULL)
+    while (aux != NULL)
     {
-        compare = music_compare_order(aux->music, music);
+        int compare = music_compare_order(aux->music, music);
+        
         if (compare == MUSIC_EQUAL)
         {
-            // já existe uma música com esse nome
-            return 2;
+            char *existing_artist = music_get_artist(aux->music);
+            
+            if (existing_artist != NULL && new_artist != NULL && 
+                strcmp(existing_artist, new_artist) == 0)
+            {
+                return 2;
+            }
+            insert_position = aux->next;
         }
         else if (compare == MUSIC2_BEFORE)
         {
+            insert_position = aux;
             break;
         }
-
+        else
+        {
+            insert_position = aux->next;
+        }
+        
         aux = aux->next;
     }
 
-    if (aux == NULL) return playlist_add_end(playlist,music);
+    if (insert_position == NULL) 
+        return playlist_add_end(playlist, music);
 
-    return playlist_add_before(playlist,aux,music);
+    return playlist_add_before(playlist, insert_position, music);
 }
 
 int playlist_add_end(PlayList *playlist, Music *music)
